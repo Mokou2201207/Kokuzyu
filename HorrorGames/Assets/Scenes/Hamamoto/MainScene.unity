@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 1
-  m_FogColor: {r: 0.12452829, g: 0.11912423, b: 0.12405837, a: 1}
+  m_FogColor: {r: 0.03396219, g: 0.03248836, b: 0.03396219, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.15
   m_LinearFogStart: 0
@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.28093272, g: 0.42677042, b: 0.79622644, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 302e59db7c34a9d49b90a60990903a8c, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 81f714daf7144784b8a2f42f1cd30927, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -6564,6 +6564,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 844544394}
+  - component: {fileID: 844544395}
   m_Layer: 0
   m_Name: HandyLight
   m_TagString: Untagged
@@ -6589,6 +6590,27 @@ Transform:
   - {fileID: 323023810}
   m_Father: {fileID: 529406285}
   m_LocalEulerAnglesHint: {x: 11.277, y: 359.986, z: 0}
+--- !u!95 &844544395
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844544393}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fe90e5275dabfea4387b7aa09f82a0e6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &853625188
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8950,8 +8972,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: e9ce97b7a206dc64d90931ea044e0c72, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 1
-  m_FrequencyGain: 1
+  m_AmplitudeGain: 0.15
+  m_FrequencyGain: 0.15
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &1152023839
 MonoBehaviour:
