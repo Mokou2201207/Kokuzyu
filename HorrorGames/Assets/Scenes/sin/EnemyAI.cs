@@ -14,11 +14,13 @@ public class EnemyAI : MonoBehaviour
     public float wanderInterval = 3f;
 
     private NavMeshAgent agent;
+    [SerializeField]private Animator animator; // ★追加
     private float wanderTimer;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponentInChildren<Animator>(); // ★追加
         wanderTimer = wanderInterval;
     }
 
@@ -28,14 +30,26 @@ public class EnemyAI : MonoBehaviour
 
         if (CanSeePlayer())
         {
-            // ?? プレイヤーを見た → 追いかける
             agent.SetDestination(target.position);
         }
         else
         {
-            // ? 見えてない → 徘徊
             Wander();
         }
+
+        // ★ここでアニメーション制御
+        UpdateAnimation();
+    }
+
+    void UpdateAnimation()
+    {
+        float speed = agent.velocity.magnitude;
+
+        bool isMoving = !agent.pathPending &&
+                        agent.remainingDistance > agent.stoppingDistance &&
+                        speed > 0.05f;
+
+        animator.SetBool("isWalking", isMoving);
     }
 
     void Wander()
