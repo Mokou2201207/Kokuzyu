@@ -5,104 +5,21 @@ public class EnemyAI : MonoBehaviour
 {
     public Transform target;
 
-    [Header("視界")]
-    public float viewAngle = 60f;
-    public float viewDistance = 10f;
-
-    [Header("徘徊")]
-    public float wanderRadius = 10f;
-    public float wanderInterval = 3f;
-
     private NavMeshAgent agent;
-    [SerializeField]private Animator animator; // ★追加
-    private float wanderTimer;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>(); // ★追加
-        wanderTimer = wanderInterval;
     }
 
     void Update()
     {
-        if (target == null) return;
+        transform.LookAt(target);
 
-        if (CanSeePlayer())
+        if (target != null)
         {
-            agent.SetDestination(target.position);
+            // ターゲットの位置を目的地として設定
+            agent.destination = target.position;
         }
-        else
-        {
-            Wander();
-        }
-
-        // ★ここでアニメーション制御
-        UpdateAnimation();
-    }
-
-    void UpdateAnimation()
-    {
-        float speed = agent.velocity.magnitude;
-
-        bool isMoving = !agent.pathPending &&
-                        agent.remainingDistance > agent.stoppingDistance &&
-                        speed > 0.05f;
-
-        animator.SetBool("isWalking", isMoving);
-    }
-
-    void Wander()
-    {
-        wanderTimer += Time.deltaTime;
-
-        if (wanderTimer >= wanderInterval)
-        {
-            Vector3 newPos = RandomNavSphere(transform.position, wanderRadius);
-            agent.SetDestination(newPos);
-            wanderTimer = 0;
-        }
-    }
-
-    Vector3 RandomNavSphere(Vector3 origin, float dist)
-    {
-        Vector3 randDirection = Random.insideUnitSphere * dist;
-        randDirection += origin;
-
-        NavMeshHit navHit;
-
-        if (NavMesh.SamplePosition(randDirection, out navHit, dist, NavMesh.AllAreas))
-        {
-            return navHit.position;
-        }
-
-        return origin;
-    }
-
-    bool CanSeePlayer()
-    {
-        Vector3 directionToPlayer = target.position - transform.position;
-        float distance = directionToPlayer.magnitude;
-
-        if (distance > viewDistance)
-            return false;
-
-        float angle = Vector3.Angle(transform.forward, directionToPlayer);
-
-        if (angle < viewAngle / 2f)
-        {
-            Ray ray = new Ray(transform.position, directionToPlayer.normalized);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, viewDistance))
-            {
-                if (hit.transform == target)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }
