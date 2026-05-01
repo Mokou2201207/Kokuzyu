@@ -9,4 +9,7 @@ UserSettings
 *.sln
 HorrorGames/Assets/Aseets/SkyBox/Space Skybox/SpaceSkyboxes4K.unitypackage
 
-/HorrorGames/Assets/AssetDatas
+
+/HorrorGames/Assets/AssetDatas/P09_Modular_Humanoid
+HorrorGames/Assets/AssetDatas/ARPGPack/ARPGSamurai/Animations/Generic/ARPG_Samurai.fbx
+HorrorGames/Assets/AssetDatas/StylizedDragonPack/Meshes/Dragon.fbx
