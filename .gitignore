@@ -8,4 +8,5 @@ UserSettings
 *.csproj
 *.sln
 HorrorGames/Assets/Aseets/SkyBox/Space Skybox/SpaceSkyboxes4K.unitypackage
-/HorrorGames/Assets
+
+/HorrorGames/Assets/AssetDatas
