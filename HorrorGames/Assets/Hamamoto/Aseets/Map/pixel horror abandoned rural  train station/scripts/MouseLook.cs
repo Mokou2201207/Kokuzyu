@@ -5,7 +5,7 @@ namespace littleDog
 {
     public class MouseLook : MonoBehaviour
     {
-        public float mouseSensitivity = 100f;
+        public float mouseSensitivity = 2f;
         public Transform PlayerBody;
         float Xrot = 0f;
         public static bool CanMove = true;
