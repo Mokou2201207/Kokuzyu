@@ -10,6 +10,12 @@ public class Crosshairs : MonoBehaviour
     [Header("クロスヘアのImage"), SerializeField]
     private Image crosshairImage;
 
+    [Header("通常のクロスヘア"), SerializeField]
+    private Sprite normalSprite;
+    [Header("アイテムの場合のクロスヘア"), SerializeField]
+    private Sprite targetSprite;
+
+
     [Header("Rayの半径"), SerializeField]
     private float sphereRadius = 0.5f;
     [Header("Rayの距離"),SerializeField]
@@ -24,10 +30,22 @@ public class Crosshairs : MonoBehaviour
         if (Physics.SphereCast(ray, sphereRadius, out hit, maxDistance))
         {
             Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.red);
+            //アイテムに当たってるとき
             if (hit.collider.CompareTag("Item"))
             {
-                Debug.Log("アイテムをとらえています");
+                //スプライト変換
+               crosshairImage.sprite=targetSprite;
             }
+            else
+            {
+                //スプライト変換
+                crosshairImage.sprite = normalSprite;
+            }
+        }
+        //ものがまずなにも当たってない時
+        else
+        {
+            crosshairImage.sprite = normalSprite;
         }
     }
    
