@@ -22,4 +22,20 @@ public class EnemyAI : MonoBehaviour
             agent.destination = target.position;
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.name == "Player")
+        {
+            Debug.Log("プレイヤー発見！");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.name == "Player")
+        {
+            Debug.Log("プレイヤーが範囲外へ");
+        }
+    }
 }
