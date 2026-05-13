@@ -3956,6 +3956,10 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1028442974200992139, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
+      propertyPath: moveSE
+      value: 
+      objectReference: {fileID: 8300000, guid: 09efb98eddd144f498d08038d2007a18, type: 3}
+    - target: {fileID: 1028442974200992139, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
       propertyPath: gravity
       value: -100
       objectReference: {fileID: 0}

@@ -4,8 +4,9 @@ using UnityEngine;
 using Cinemachine;
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("プレイヤー"), SerializeField]
-    private CharacterController controller;
+    [Header("コンポーネントを自動でアタッチ")]
+    [SerializeField] private CharacterController controller;
+    [SerializeField] private AudioSource audioSource;
 
     [Header("シネマシーンのカメラをアタッチ"),SerializeField]
     private CinemachineVirtualCamera virtualCamera;
@@ -19,6 +20,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("ジャンプ力"), SerializeField]
     private float JumpHight = 1;
 
+    [Header("移動SE")]
+    [SerializeField] private AudioClip moveSE;
+
+
     private CinemachineBasicMultiChannelPerlin noise;
     //現在のスピードを保管変数
     private float speed;
@@ -27,6 +32,7 @@ public class PlayerMovement : MonoBehaviour
     {
         //格納
         controller = gameObject.GetComponent<CharacterController>();
+        audioSource = gameObject.GetComponent<AudioSource>();
 
         if (virtualCamera != null)
         {
@@ -48,30 +54,52 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        if (move.magnitude > 0.1f)
+        //移動かつ地面を踏んでいたら
+        if (move.magnitude > 0.1f&& controller.isGrounded)
         {
+            // まだ音が鳴っていなければ再生を開始
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+
             //shiftで移動速度変化
             if (Input.GetKey(KeyCode.LeftShift))
             {
+                //移動音を再生
+                audioSource.clip = moveSE;
+                audioSource.pitch = 1.3f;
+
                 //画面の揺れも変化
                 //揺れの大きさ
                 noise.m_AmplitudeGain = 1.3f;
                 //揺れの速さ
                 noise.m_FrequencyGain = 0.3f;
+
                 speed = runSpeed;
             }
             else
             {
+                //移動音を再生
+                audioSource.clip = moveSE;
+                audioSource.pitch = 1.0f;
+
                 //画面の揺れも変化
                 //揺れの大きさ
                 noise.m_AmplitudeGain = 0.7f;
                 //揺れの速さ
                 noise.m_FrequencyGain = 0.3f;
+
                 speed = walkSpeed;
             }
         }
         else
         {
+            // 止まっている、または空中にいる時は音を止める
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
             noise.m_AmplitudeGain = 0.3f; 
             noise.m_FrequencyGain = 0.1f;
             speed = 0f;
