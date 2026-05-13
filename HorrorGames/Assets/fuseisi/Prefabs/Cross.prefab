@@ -62,10 +62,31 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: abc00000000009344833345544098275, type: 2}
     - target: {fileID: 919132149155446097, guid: e08084af63af699419c8254e3bb1cfd5, type: 3}
       propertyPath: m_Name
-      value: SimpleCross
+      value: Cross
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e08084af63af699419c8254e3bb1cfd5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8367954456093262417}
   m_SourcePrefab: {fileID: 100100000, guid: e08084af63af699419c8254e3bb1cfd5, type: 3}
+--- !u!1 &756096962090005728 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e08084af63af699419c8254e3bb1cfd5, type: 3}
+  m_PrefabInstance: {fileID: 486208438727952817}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8367954456093262417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756096962090005728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8dcf30f90f00c748865b7da90ec0f85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotateSpeed: 50
