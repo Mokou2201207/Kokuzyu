@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("シネマシーンのカメラをアタッチ"),SerializeField]
     private CinemachineVirtualCamera virtualCamera;
 
+    [Header("SutaminaParameterManagerをアタッチ"), SerializeField]
+    private SutaminaParameterManager sutaminaParameterManagerScript;
+
     [Header("移動速度")]
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float runSpeed = 10f;
@@ -64,8 +67,11 @@ public class PlayerMovement : MonoBehaviour
             }
 
             //shiftで移動速度変化
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(KeyCode.LeftShift)&&!sutaminaParameterManagerScript.isExhausted)
             {
+                //走っているフラグオン
+                sutaminaParameterManagerScript.isRun = true;
+
                 //移動音を再生
                 audioSource.clip = moveSE;
                 audioSource.pitch = 1.3f;
@@ -80,6 +86,9 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
+                //走っているフラグオフ
+                sutaminaParameterManagerScript.isRun = false;
+
                 //移動音を再生
                 audioSource.clip = moveSE;
                 audioSource.pitch = 1.0f;
