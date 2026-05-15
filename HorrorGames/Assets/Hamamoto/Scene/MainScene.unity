@@ -2082,6 +2082,50 @@ PrefabInstance:
       addedObject: {fileID: 1229270990}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 513a4c58a0cd1044795caa6b2d7e4b59, type: 3}
+--- !u!1 &237636771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 237636773}
+  - component: {fileID: 237636772}
+  m_Layer: 0
+  m_Name: Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &237636772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237636771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c570e2775ea0e44fb57074dc5480f65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &237636773
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237636771}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -26.65024, y: -117.99523, z: -226.39139}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &237808617
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2414,9 +2458,10 @@ GameObject:
   - component: {fileID: 281502149}
   - component: {fileID: 281502148}
   - component: {fileID: 281502147}
+  - component: {fileID: 281502151}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Item
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2507,6 +2552,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &281502151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281502146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67fd7b96d2cd1c045ba2621492c213a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: unko
+  itemType: 0
 --- !u!1001 &287550189
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2854,7 +2913,6 @@ GameObject:
   - component: {fileID: 333958587}
   - component: {fileID: 333958586}
   - component: {fileID: 333958585}
-  - component: {fileID: 333958588}
   - component: {fileID: 333958589}
   m_Layer: 0
   m_Name: ParameterCanva
@@ -2947,29 +3005,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 1
   m_TargetDisplay: 0
---- !u!114 &333958588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 333958583}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b6800d1b6ffed343bd8d6c59e380556, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sutaminaSlider: {fileID: 1993965603}
-  decreaseSpeed: 0.2
-  sutaminaHeelTime: 3
-  dizzinessBackground: {fileID: 795982243}
-  metarAnimator: {fileID: 1165202329}
-  shortnesAnimator: {fileID: 795982242}
-  audioSource: {fileID: 0}
-  shortnessSE: {fileID: 8300000, guid: 15a3ad354e7840441978102979135037, type: 3}
-  isRun: 0
-  isStaminaFull: 1
-  isExhausted: 0
 --- !u!82 &333958589
 AudioSource:
   m_ObjectHideFlags: 0
@@ -14809,7 +14844,7 @@ PrefabInstance:
     - target: {fileID: 1028442974200992139, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
       propertyPath: sutaminaParameterManagerScript
       value: 
-      objectReference: {fileID: 333958588}
+      objectReference: {fileID: 2059203580}
     - target: {fileID: 2573594799482561210, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
       propertyPath: m_Name
       value: Player
@@ -14915,6 +14950,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2573594799482561210, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2059203574}
+    - targetCorrespondingSourceObject: {fileID: 2573594799482561210, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2059203580}
     - targetCorrespondingSourceObject: {fileID: 840457326483642086, guid: 2f79b33e970aa464a978e550662078fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 529406289}
@@ -16968,6 +17006,29 @@ MonoBehaviour:
   targetSprite: {fileID: 21300000, guid: 754fa37bf187ab94f84adbc0f3644e82, type: 3}
   sphereRadius: 0.5
   maxDistance: 5
+--- !u!114 &2059203580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2059203567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b6800d1b6ffed343bd8d6c59e380556, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sutaminaSlider: {fileID: 1993965603}
+  decreaseSpeed: 0.1
+  sutaminaHeelTime: 3
+  dizzinessBackground: {fileID: 795982243}
+  metarAnimator: {fileID: 1165202329}
+  shortnesAnimator: {fileID: 795982242}
+  audioSource: {fileID: 333958589}
+  shortnessSE: {fileID: 8300000, guid: 15a3ad354e7840441978102979135037, type: 3}
+  isRun: 0
+  isStaminaFull: 1
+  isExhausted: 0
 --- !u!1001 &2061315815
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18401,3 +18462,4 @@ SceneRoots:
   - {fileID: 1152849363}
   - {fileID: 281502150}
   - {fileID: 1033095972}
+  - {fileID: 237636773}

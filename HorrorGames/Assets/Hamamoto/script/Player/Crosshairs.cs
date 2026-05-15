@@ -31,10 +31,17 @@ public class Crosshairs : MonoBehaviour
         {
             Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.red);
             //アイテムに当たってるとき
-            if (hit.collider.CompareTag("Item"))
+            if (hit.collider.TryGetComponent<InteractableItem>(out var item))
             {
                 //スプライト変換
                crosshairImage.sprite=targetSprite;
+
+                // EKeyでアイテムを入手
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    item.Interact();
+                }
+
             }
             else
             {

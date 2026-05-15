@@ -21,7 +21,7 @@ public class SutaminaParameterManager : MonoBehaviour
     [Header("視界のアニメーションアタッチ"), SerializeField]
     private Animator shortnesAnimator;
 
-    [Header("コンポーネントを自動"), SerializeField]
+    [Header("コンポーネントはキャンバスから"), SerializeField]
     private AudioSource audioSource;
 
     [Header("息切れSE")]
@@ -37,10 +37,6 @@ public class SutaminaParameterManager : MonoBehaviour
     //息切れして回復待ちかどうか
     public bool isExhausted = false;
 
-    private void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
 
     private void Update()
     {
@@ -73,7 +69,7 @@ public class SutaminaParameterManager : MonoBehaviour
             // タイマーが目標時間を超えたら回復開始
             if (recoveryTimer >= waitTime)
             {
-                sutaminaSlider.value += decreaseSpeed * Time.deltaTime;
+                sutaminaSlider.value += 0.2f * Time.deltaTime;
 
                 // 回復が始まったら息切れ状態は解除する
                 isExhausted = false;
