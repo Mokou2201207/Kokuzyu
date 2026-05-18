@@ -79,7 +79,7 @@ public class UIManager : MonoBehaviour
         {
             //—ñŽÔ
             case MissionObj.ObjType.train:
-
+ 
                 break;
         }
     }
