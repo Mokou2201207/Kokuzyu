@@ -9,11 +9,11 @@ public class MonkeyGimmick : MonoBehaviour
     
     [Tooltip("カメラの前に召喚される猿のプレハブ")]
     public GameObject jumpscareMonkeyPrefab;
+    
+    [Tooltip("猿が出現した時に鳴らす効果音（SE）")]
+    public AudioClip jumpscareSE;
 
     [Header("設定")]
-    [Tooltip("視線を外してからギミックが発動するまでに必要なカメラの回転角度")]
-    public float requiredRotationAngle = 45f;
-    
     [Tooltip("カメラを基準とした召喚位置のズレ（X:左右, Y:上下, Z:前後）")]
     public Vector3 spawnOffset = new Vector3(0, 0, 1.0f);
     
@@ -25,9 +25,8 @@ public class MonkeyGimmick : MonoBehaviour
 
     // 内部状態
     private bool isPlayerInTrigger = false;
-    private bool hasLookedAway = false;
+    private bool hasSeenMonkey = false;
     private bool isTriggered = false;
-    private Quaternion rotationWhenLookedAway;
     private Camera cam;
     
     // デバッグ用
@@ -56,6 +55,17 @@ public class MonkeyGimmick : MonoBehaviour
 
     void Update()
     {
+        // このオブジェクト（ギミック本体）がプレイヤーと顔を合わせないよう、常に背を向ける
+        if (playerCamera != null)
+        {
+            Vector3 awayDirection = transform.position - playerCamera.position;
+            awayDirection.y = 0; // 上下に傾いて不自然にならないよう、高さを無視する
+            if (awayDirection.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.LookRotation(awayDirection);
+            }
+        }
+
         // デバッグ用: Pキーで猿を表示/非表示を切り替える
         if (Input.GetKeyDown(KeyCode.P))
         {
@@ -74,23 +84,21 @@ public class MonkeyGimmick : MonoBehaviour
 
         if (isPlayerInTrigger)
         {
-            if (!hasLookedAway)
+            if (!hasSeenMonkey)
             {
-                // モンキー（このオブジェクト）が視界から外れたかチェック
-                if (!IsMonkeyInView())
+                // まだ視界に入れていない場合、視界に入るのを待つ
+                if (IsMonkeyInView())
                 {
-                    hasLookedAway = true;
-                    rotationWhenLookedAway = playerCamera.rotation;
-                    Debug.Log("MonkeyGimmick: プレイヤーが視線を外しました。カメラの回転監視を開始します。");
+                    hasSeenMonkey = true;
+                    Debug.Log("MonkeyGimmick: プレイヤーが猿を視界に入れました！目を離すと発動します。");
                 }
             }
             else
             {
-                // 視線を外した後、カメラが指定角度以上回転したか判定
-                float angle = Quaternion.Angle(rotationWhenLookedAway, playerCamera.rotation);
-                if (angle >= requiredRotationAngle)
+                // 一度視界に入れた後、画面から見えなくなったら即座に発動
+                if (!IsMonkeyInView())
                 {
-                    Debug.Log($"MonkeyGimmick: プレイヤーが {angle:F1} 度傾きました（必要角度: {requiredRotationAngle}度）。");
+                    Debug.Log("MonkeyGimmick: プレイヤーが猿から目を離しました！ギミック発動！");
                     TriggerJumpscare();
                 }
             }
@@ -115,13 +123,11 @@ public class MonkeyGimmick : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"MonkeyGimmick: 【接触テスト】{other.name} がトリガーに触れました！");
-
         // プレイヤー（またはカメラ）が範囲内に入った
         if (other.CompareTag("Player") || other.GetComponentInChildren<Camera>() != null || other.GetComponentInParent<Camera>() != null)
         {
             isPlayerInTrigger = true;
-            hasLookedAway = false; // 状態をリセット
+            hasSeenMonkey = false; // 状態をリセット
             Debug.Log($"MonkeyGimmick: プレイヤー判定（{other.name}）が範囲内に入りました。");
         }
     }
@@ -129,10 +135,10 @@ public class MonkeyGimmick : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         // 範囲外に出た
-        if (other.CompareTag("Player") || other.GetComponentInChildren<Camera>() != null)
+        if (other.CompareTag("Player") || other.GetComponentInChildren<Camera>() != null || other.GetComponentInParent<Camera>() != null)
         {
             isPlayerInTrigger = false;
-            hasLookedAway = false;
+            hasSeenMonkey = false;
             Debug.Log("MonkeyGimmick: プレイヤーが範囲外に出ました。ギミックをリセットします。");
         }
     }
@@ -178,6 +184,12 @@ public class MonkeyGimmick : MonoBehaviour
             GameObject spawnedMonkey = Instantiate(jumpscareMonkeyPrefab, spawnPosition, spawnRotation);
             Debug.Log($"MonkeyGimmick: オフセット {spawnOffset} の位置に猿を召喚しました！");
             
+            // SEを再生
+            if (jumpscareSE != null)
+            {
+                AudioSource.PlayClipAtPoint(jumpscareSE, playerCamera.position);
+            }
+            
             if (followCamera)
             {
                 // カメラの子オブジェクトにして、カメラの動きに追従させる
@@ -186,6 +198,9 @@ public class MonkeyGimmick : MonoBehaviour
 
             // 指定時間後に消去
             Destroy(spawnedMonkey, disappearTime);
+            
+            // アタッチされている元のオブジェクト（見つめていた猿）は即座に削除する
+            Destroy(gameObject);
         }
         else
         {
