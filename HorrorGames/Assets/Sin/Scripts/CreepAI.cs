@@ -17,6 +17,10 @@ public class CreepAI : MonoBehaviour
     [Tooltip("次の目的地を決めるまでの時間（秒）")]
     public float wanderWaitTime = 3f;
 
+    [Header("アニメーション設定")]
+    [Tooltip("子オブジェクトにあるAnimatorを指定（指定がない場合は自動取得）")]
+    public Animator animator;
+
     private NavMeshAgent agent;
     private float wanderTimer;
 
@@ -39,6 +43,12 @@ public class CreepAI : MonoBehaviour
             }
         }
 
+        // Animatorが設定されていない場合、子オブジェクトから取得する
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+        }
+
         // RigidbodyとNavMeshAgentが物理演算で干渉しないように、RigidbodyをKinematicに設定
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
@@ -58,14 +68,26 @@ public class CreepAI : MonoBehaviour
         {
             // プレイヤーが近い場合：プレイヤーをターゲットにして追いかける
             agent.SetDestination(player.position);
-            
+
             // 追いかけている時はタイマーをリセットし、見失ったときにすぐ次の徘徊ポイントを探すようにする
-            wanderTimer = wanderWaitTime; 
+            wanderTimer = wanderWaitTime;
+
+            // 追いかけるアニメーションに切り替え (Change = true)
+            if (animator != null)
+            {
+                animator.SetBool("Change", true);
+            }
         }
         else
         {
             // プレイヤーが遠い場合：周辺をウロウロする（徘徊）
             Wander();
+
+            // 徘徊アニメーションに切り替え (Change = false)
+            if (animator != null)
+            {
+                animator.SetBool("Change", false);
+            }
         }
     }
 
