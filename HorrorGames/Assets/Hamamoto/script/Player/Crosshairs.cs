@@ -39,9 +39,20 @@ public class Crosshairs : MonoBehaviour
                 // EKeyでアイテムを入手
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    item.Interact();
+                    item.ItemInteract();
                 }
 
+            }
+            else if(hit.collider.TryGetComponent<MissionObj>(out var mission))
+            {
+                //スプライト変換
+                crosshairImage.sprite = targetSprite;
+
+                // EKeyでアイテムを入手
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    mission.MissionInteract();
+                }
             }
             else
             {

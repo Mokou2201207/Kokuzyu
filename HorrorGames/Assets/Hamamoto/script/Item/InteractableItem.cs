@@ -15,16 +15,20 @@ public class InteractableItem : MonoBehaviour
     /// </summary>
     public enum ItemType
     {
-        Tire,　　　　//タイヤ
-        Coal,       // 石炭
-        Driver,    // ドライバー
-        Key　　　　//鍵
+        //タイヤ
+        Tire,
+        // 石炭
+        Coal,
+        // ドライバー
+        Driver,
+        //鍵
+        Key,
     }
 
     /// <summary>
     /// クロスヘアの処理から実行される処理
     /// </summary>
-    public void Interact()
+    public void ItemInteract()
     {
         // InventoryManagerからアイテムをとったことを流す
         InventoryManager.instance.AddItem(itemType);

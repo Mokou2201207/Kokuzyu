@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     {
         //アイテムが追加された時の処理
         InventoryManager.instance.OnItemAdded += UpdateItemUI;
+        InventoryManager.instance.OnMissionObj += UpdateMissionUI;
 
         //最初は画像は黒く
         tireIcon.color = Color.black;
@@ -65,4 +66,21 @@ public class UIManager : MonoBehaviour
         }
 
     }
-}
+
+
+    /// <summary>
+    /// 選択したミッションによってUIを変化
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="count"></param>
+    private void UpdateMissionUI(MissionObj.ObjType type, int count)
+    {
+        switch(type)
+        {
+            //列車
+            case MissionObj.ObjType.train:
+
+                break;
+        }
+    }
+    }
