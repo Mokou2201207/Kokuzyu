@@ -817,7 +817,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4907239047242697930, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 26.400038
+      value: 24.17
       objectReference: {fileID: 0}
     - target: {fileID: 4907239047242697930, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1061,6 +1061,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2134642461}
   m_SourcePrefab: {fileID: 100100000, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
+--- !u!95 &1735003606 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7440230004507457928, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
+  m_PrefabInstance: {fileID: 1708773615}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2134642457 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4907239047242697928, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
@@ -1128,9 +1133,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 455977020}
-  chaseDistance: 15
+  chaseDistance: 5
   wanderRadius: 10
   wanderWaitTime: 3
+  animator: {fileID: 1735003606}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
