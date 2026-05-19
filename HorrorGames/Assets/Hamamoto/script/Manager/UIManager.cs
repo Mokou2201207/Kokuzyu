@@ -17,6 +17,11 @@ public class UIManager : MonoBehaviour
     [Header("ドライバーアイコン")]
     [SerializeField] private Image driverIcon;
 
+    [Header("ミッションテキストとImageとアニメーターをアタッチ")]
+    [SerializeField] private Image missionImage;
+    [SerializeField] private Text missionText;
+    [SerializeField]private Animator animator;
+
     private void Start()
     {
         //アイテムが追加された時の処理
@@ -28,6 +33,9 @@ public class UIManager : MonoBehaviour
         keyIcon.color = Color.black;
         coalIcon.color = Color.black;
         driverIcon.color = Color.black;
+
+        //非表示
+        missionImage.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -75,12 +83,28 @@ public class UIManager : MonoBehaviour
     /// <param name="count"></param>
     private void UpdateMissionUI(MissionObj.ObjType type, int count)
     {
-        switch(type)
+        switch (type)
         {
             //列車
             case MissionObj.ObjType.train:
- 
+                missionText.text="素材が足りません".ToString();
+                StartCoroutine(MissionImageOpenCoroutine());
                 break;
         }
     }
+
+    /// <summary>
+    /// ミッションImage用のコルーチン
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator MissionImageOpenCoroutine()
+    {
+        //表示
+        missionImage.gameObject.SetActive (true);
+        yield return new WaitForSeconds(3f);
+
+        yield return new WaitForSeconds(3f);
+        //非表示
+        missionImage.gameObject.SetActive(false);
     }
+}

@@ -762,7 +762,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 45}
+  m_SizeDelta: {x: 941.58, y: 81.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &117194228
 MonoBehaviour:
@@ -786,18 +786,18 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 89d976c510d3d554693f48b56361ea94, type: 3}
-    m_FontSize: 30
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
-    m_MaxSize: 40
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u3046\u3093\u3053\u304C\u597D\u304D\u3067\u3059\u3002"
+  m_Text: Text
 --- !u!222 &117194229
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2196,6 +2196,9 @@ MonoBehaviour:
   coalIcon: {fileID: 1853855042}
   keyIcon: {fileID: 1924686643}
   driverIcon: {fileID: 1845088033}
+  missionImage: {fileID: 1056708318}
+  missionText: {fileID: 117194228}
+  animator: {fileID: 0}
 --- !u!82 &237636775
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2305,6 +2308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   partsSE: {fileID: 8300000, guid: b157889075996744cbf5bd748145408b, type: 3}
+  horrorPushSE: {fileID: 8300000, guid: 8fe0e222018d3bc468404ae3a42e10a4, type: 3}
 --- !u!1001 &237808617
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10038,7 +10042,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1056708317
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10056,8 +10060,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 87.98}
-  m_SizeDelta: {x: 900, y: 60}
+  m_AnchoredPosition: {x: 0, y: 90}
+  m_SizeDelta: {x: 1100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1056708318
 MonoBehaviour:
