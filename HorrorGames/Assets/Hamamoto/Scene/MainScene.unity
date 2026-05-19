@@ -10634,6 +10634,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7683643234174256649, guid: 6cf5d4da791a0144f8b5fb5336476c50, type: 3}
+      propertyPath: jumpscareSE
+      value: 
+      objectReference: {fileID: 8300000, guid: 97ba15cbcde7096439efc17811523cea, type: 3}
+    - target: {fileID: 7683643234174256649, guid: 6cf5d4da791a0144f8b5fb5336476c50, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 529406285}
