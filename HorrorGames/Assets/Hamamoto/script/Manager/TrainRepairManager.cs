@@ -13,7 +13,7 @@ public class TrainRepairManager : MonoBehaviour
     [SerializeField] private Image repairGaugeImage;
 
     [Header("‰½•bŠÔC—‚·‚é‚©")]
-    [SerializeField] private readonly float repairRequiredTime = 5f;
+    [SerializeField] private readonly float repairRequiredTime = 10f;
 
     [Header("C—’†‚ÌSE"),SerializeField]
     private AudioClip repairAudioClip;
