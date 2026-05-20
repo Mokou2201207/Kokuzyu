@@ -1,59 +1,58 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomSpawner : MonoBehaviour
 {
-    [Header("生成するPrefab")]
+    [Header("Prefab")]
     public GameObject crossPrefab;
     public GameObject batteryPrefab;
-
-    [Header("スポーンポイント")]
-    public Transform[] spawnPoints;
+    public GameObject tirePrefab;
+    public GameObject coalPrefab;
+    public GameObject driverPrefab;
+    public GameObject keyPrefab;
 
     [Header("生成数")]
     public int crossCount = 10;
     public int batteryCount = 10;
 
+    [Header("Map範囲")]
+    public float minX = -50f;
+    public float maxX = 50f;
+    public float minZ = -50f;
+    public float maxZ = 50f;
+
     void Start()
     {
-        // スポーンポイントをコピー
-        List<Transform> availablePoints = new List<Transform>(spawnPoints);
-
-        // cross生成
+        // cross
         for (int i = 0; i < crossCount; i++)
         {
-            SpawnItem(crossPrefab, availablePoints);
+            SpawnRandomItem(crossPrefab);
         }
 
-        // battery生成
+        // battery
         for (int i = 0; i < batteryCount; i++)
         {
-            SpawnItem(batteryPrefab, availablePoints);
+            SpawnRandomItem(batteryPrefab);
         }
+
+        // レアアイテム
+        SpawnRandomItem(tirePrefab);
+        SpawnRandomItem(coalPrefab);
+        SpawnRandomItem(driverPrefab);
+        SpawnRandomItem(keyPrefab);
     }
 
-    void SpawnItem(GameObject itemPrefab, List<Transform> points)
+    void SpawnRandomItem(GameObject itemPrefab)
     {
-        // スポーンポイント不足チェック
-        if (points.Count == 0)
-        {
-            Debug.LogWarning("スポーンポイントが足りません");
-            return;
-        }
-
-        // ランダムな場所を選択
-        int randomIndex = Random.Range(0, points.Count);
-
-        Transform spawnPoint = points[randomIndex];
-
-        // アイテム生成
-        Instantiate(
-            itemPrefab,
-            spawnPoint.position,
-            spawnPoint.rotation
+        Vector3 randomPosition = new Vector3(
+            Random.Range(minX, maxX),
+            1f,
+            Random.Range(minZ, maxZ)
         );
 
-        // 同じ場所を使わないよう削除
-        points.RemoveAt(randomIndex);
+        Instantiate(
+            itemPrefab,
+            randomPosition,
+            Quaternion.identity
+        );
     }
 }
