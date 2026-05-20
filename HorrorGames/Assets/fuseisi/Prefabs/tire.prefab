@@ -93,6 +93,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3085441815097769110}
   - component: {fileID: -5519407632551555159}
+  - component: {fileID: 4001961199923596997}
+  - component: {fileID: -7647758308945832738}
   m_Layer: 0
   m_Name: tire
   m_TagString: Untagged
@@ -110,7 +112,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.848263, y: 1.72, z: 7.9328265}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6113088578192979692}
@@ -130,6 +132,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateSpeed: 50
+--- !u!65 &4001961199923596997
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6805441030708269596}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2.7001257, z: 2.496635}
+  m_Center: {x: 0, y: 0.01903236, z: 0.053490795}
+--- !u!114 &-7647758308945832738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6805441030708269596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67fd7b96d2cd1c045ba2621492c213a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u30BF\u30A4\u30E4"
+  itemType: 0
 --- !u!1 &7166018377079479268
 GameObject:
   m_ObjectHideFlags: 0

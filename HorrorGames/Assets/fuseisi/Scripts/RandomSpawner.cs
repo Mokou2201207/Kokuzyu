@@ -10,49 +10,70 @@ public class RandomSpawner : MonoBehaviour
     public GameObject driverPrefab;
     public GameObject keyPrefab;
 
-    [Header("������")]
+    [Header("生成数")]
     public int crossCount = 10;
     public int batteryCount = 10;
 
-    [Header("Map�͈�")]
-    public float minX = -50f;
-    public float maxX = 50f;
-    public float minZ = -50f;
-    public float maxZ = 50f;
+    [Header("ランダムスポーン位置 (バッテリーと十字架用)")]
+    public Transform[] randomSpawnPoints;
+
+    [Header("特定アイテムのスポーン位置")]
+    public Transform tireSpawnPoint;
+    public Transform coalSpawnPoint;
+    public Transform driverSpawnPoint;
+    public Transform keySpawnPoint;
 
     void Start()
     {
-        // cross
-        for (int i = 0; i < crossCount; i++)
+        // ランダムスポーン地点が設定されているか確認
+        if (randomSpawnPoints != null && randomSpawnPoints.Length > 0)
         {
-            SpawnRandomItem(crossPrefab);
+            // cross
+            for (int i = 0; i < crossCount; i++)
+            {
+                SpawnRandomItem(crossPrefab);
+            }
+
+            // battery
+            for (int i = 0; i < batteryCount; i++)
+            {
+                SpawnRandomItem(batteryPrefab);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Random Spawn Pointsが設定されていません。");
         }
 
-        // battery
-        for (int i = 0; i < batteryCount; i++)
-        {
-            SpawnRandomItem(batteryPrefab);
-        }
-
-        // ���A�A�C�e��
-        SpawnRandomItem(tirePrefab);
-        SpawnRandomItem(coalPrefab);
-        SpawnRandomItem(driverPrefab);
-        SpawnRandomItem(keyPrefab);
+        // レアアイテム（特定の位置）
+        SpawnSpecificItem(tirePrefab, tireSpawnPoint);
+        SpawnSpecificItem(coalPrefab, coalSpawnPoint);
+        SpawnSpecificItem(driverPrefab, driverSpawnPoint);
+        SpawnSpecificItem(keyPrefab, keySpawnPoint);
     }
 
     void SpawnRandomItem(GameObject itemPrefab)
     {
-        Vector3 randomPosition = new Vector3(
-            Random.Range(minX, maxX),
-            1f,
-            Random.Range(minZ, maxZ)
-        );
+        // 10個など設定されたランダムスポーン位置から一つを選ぶ
+        int randomIndex = Random.Range(0, randomSpawnPoints.Length);
+        Transform spawnPoint = randomSpawnPoints[randomIndex];
 
-        Instantiate(
-            itemPrefab,
-            randomPosition,
-            Quaternion.identity
-        );
+        if (spawnPoint != null)
+        {
+            Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+        }
+    }
+
+    void SpawnSpecificItem(GameObject itemPrefab, Transform spawnPoint)
+    {
+        // 指定された位置が設定されているか確認して生成
+        if (spawnPoint != null)
+        {
+            Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+        }
+        else
+        {
+            Debug.LogWarning(itemPrefab.name + " のスポーン位置が設定されていません。");
+        }
     }
 }
