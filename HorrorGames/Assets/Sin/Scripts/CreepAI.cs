@@ -8,10 +8,12 @@ public class CreepAI : MonoBehaviour
     [Header("ターゲット設定")]
     [Tooltip("追いかける対象（Player）")]
     public Transform player;
-    [Tooltip("プレイヤーを検知して追いかけ始める距離")]
-    public float chaseDistance = 15f;
+    [Tooltip("ターゲットを追いかける時間（秒）")]
+    public float chaseDuration = 10f;
 
     [Header("徘徊（ウロウロ）設定")]
+    [Tooltip("ウロウロする時間（秒）")]
+    public float wanderDuration = 10f;
     [Tooltip("ウロウロする範囲の半径")]
     public float wanderRadius = 10f;
     [Tooltip("次の目的地を決めるまでの時間（秒）")]
@@ -23,6 +25,8 @@ public class CreepAI : MonoBehaviour
 
     private NavMeshAgent agent;
     private float wanderTimer;
+    private float stateTimer;
+    private bool isChasing = true;
 
     void Start()
     {
@@ -61,32 +65,51 @@ public class CreepAI : MonoBehaviour
     {
         if (player == null) return;
 
-        // プレイヤーとCreep2の距離を計算
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        // 状態のタイマーを更新
+        stateTimer += Time.deltaTime;
 
-        if (distanceToPlayer <= chaseDistance)
+        if (isChasing)
         {
-            // プレイヤーが近い場合：プレイヤーをターゲットにして追いかける
-            agent.SetDestination(player.position);
-
-            // 追いかけている時はタイマーをリセットし、見失ったときにすぐ次の徘徊ポイントを探すようにする
-            wanderTimer = wanderWaitTime;
-
-            // 追いかけるアニメーションに切り替え (Change = true)
-            if (animator != null)
+            // 追いかける時間が経過したら徘徊に切り替え
+            if (stateTimer >= chaseDuration)
             {
-                animator.SetBool("Change", true);
+                isChasing = false;
+                stateTimer = 0f;
+                wanderTimer = wanderWaitTime; // すぐに徘徊の目的地を決めるようにリセット
+                
+                if (animator != null)
+                {
+                    animator.SetBool("Change", false);
+                }
+            }
+            else
+            {
+                // プレイヤーをターゲットにして追いかける
+                agent.SetDestination(player.position);
+
+                if (animator != null)
+                {
+                    animator.SetBool("Change", true);
+                }
             }
         }
         else
         {
-            // プレイヤーが遠い場合：周辺をウロウロする（徘徊）
-            Wander();
-
-            // 徘徊アニメーションに切り替え (Change = false)
-            if (animator != null)
+            // 徘徊する時間が経過したら追いかける状態に切り替え
+            if (stateTimer >= wanderDuration)
             {
-                animator.SetBool("Change", false);
+                isChasing = true;
+                stateTimer = 0f;
+            }
+            else
+            {
+                // 周辺をウロウロする（徘徊）
+                Wander();
+
+                if (animator != null)
+                {
+                    animator.SetBool("Change", false);
+                }
             }
         }
     }
