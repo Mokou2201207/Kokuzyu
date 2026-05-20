@@ -8,6 +8,8 @@ public class CreepAI : MonoBehaviour
     [Header("ターゲット設定")]
     [Tooltip("追いかける対象（Player）")]
     public Transform player;
+    [Tooltip("プレイヤーを検知して追いかける範囲（距離）")]
+    public float chaseDistance = 15f;
     [Tooltip("ターゲットを追いかける時間（秒）")]
     public float chaseDuration = 10f;
 
@@ -26,7 +28,14 @@ public class CreepAI : MonoBehaviour
     private NavMeshAgent agent;
     private float wanderTimer;
     private float stateTimer;
-    private bool isChasing = true;
+    private bool isChasingPhase = true; // 交互モードの時に追跡フェーズかどうか
+
+    // 現在のアニメーション状態を記憶して、無駄な呼び出しを防ぐ
+    private bool currentAnimState = false;
+
+    // 徘徊の中心点と、現在徘徊中かどうかを判定するフラグ
+    private Vector3 wanderCenter;
+    private bool isWanderingNow = false;
 
     void Start()
     {
@@ -51,6 +60,24 @@ public class CreepAI : MonoBehaviour
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError("【エラー】子オブジェクトにAnimatorが見つかりません！");
+            }
+            else
+            {
+                Debug.Log("【確認】Animatorを自動取得しました：" + animator.gameObject.name);
+            }
+        }
+        else
+        {
+            Debug.Log("【確認】インスペクターからAnimatorが設定されています：" + animator.gameObject.name);
+        }
+
+        // 最初のアニメーション状態を確実に反映する
+        if (animator != null)
+        {
+            animator.SetBool("Change", currentAnimState);
         }
 
         // RigidbodyとNavMeshAgentが物理演算で干渉しないように、RigidbodyをKinematicに設定
@@ -65,63 +92,89 @@ public class CreepAI : MonoBehaviour
     {
         if (player == null) return;
 
-        // 状態のタイマーを更新
-        stateTimer += Time.deltaTime;
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        if (isChasing)
+        if (distanceToPlayer <= chaseDistance)
         {
-            // 追いかける時間が経過したら徘徊に切り替え
-            if (stateTimer >= chaseDuration)
-            {
-                isChasing = false;
-                stateTimer = 0f;
-                wanderTimer = wanderWaitTime; // すぐに徘徊の目的地を決めるようにリセット
-                
-                if (animator != null)
-                {
-                    animator.SetBool("Change", false);
-                }
-            }
-            else
-            {
-                // プレイヤーをターゲットにして追いかける
-                agent.SetDestination(player.position);
+            // --- 範囲内の場合：常に追跡 ---
+            agent.SetDestination(player.position);
+            SetAnimation(true);
 
-                if (animator != null)
-                {
-                    animator.SetBool("Change", true);
-                }
-            }
+            // 範囲外に出たときに備えてリセット（範囲外に出た直後は「10秒追う」からスタート）
+            stateTimer = 0f;
+            isChasingPhase = true;
+            isWanderingNow = false;
         }
         else
         {
-            // 徘徊する時間が経過したら追いかける状態に切り替え
-            if (stateTimer >= wanderDuration)
+            // --- 範囲外の場合：「10秒追跡、10秒徘徊」の繰り返しモード ---
+            stateTimer += Time.deltaTime;
+
+            // タイマーによるフェーズ（状態）の切り替え
+            if (isChasingPhase)
             {
-                isChasing = true;
-                stateTimer = 0f;
+                if (stateTimer >= chaseDuration)
+                {
+                    isChasingPhase = false;
+                    stateTimer = 0f;
+                    wanderTimer = wanderWaitTime; // 徘徊開始時にすぐ目的地を決めるため
+                }
             }
             else
             {
-                // 周辺をウロウロする（徘徊）
-                Wander();
-
-                if (animator != null)
+                if (stateTimer >= wanderDuration)
                 {
-                    animator.SetBool("Change", false);
+                    isChasingPhase = true;
+                    stateTimer = 0f;
                 }
+            }
+
+            // 現在のフェーズに応じた実際の行動
+            if (isChasingPhase)
+            {
+                // 範囲外での追跡行動
+                agent.SetDestination(player.position);
+                SetAnimation(true);
+                isWanderingNow = false;
+            }
+            else
+            {
+                // 範囲外での徘徊行動
+                if (!isWanderingNow)
+                {
+                    // 新たに徘徊を始めた瞬間、その場所を「徘徊の中心」に設定する
+                    isWanderingNow = true;
+                    wanderCenter = transform.position;
+                }
+                Wander(wanderCenter);
+                SetAnimation(false);
             }
         }
     }
 
-    void Wander()
+    // アニメーションの切り替えを管理する専用メソッド
+    void SetAnimation(bool chaseAnim)
+    {
+        if (animator == null) return;
+
+        // 今のアニメーション状態から変化があった時だけSetBoolを実行する
+        if (currentAnimState != chaseAnim)
+        {
+            Debug.Log($"【アニメーション切り替え】Change = {chaseAnim} に変更しました！");
+            animator.SetBool("Change", chaseAnim);
+            currentAnimState = chaseAnim;
+        }
+    }
+
+    void Wander(Vector3 center)
     {
         wanderTimer += Time.deltaTime;
 
         // 指定した時間が経過したか、目的地付近に到着した場合に次のランダムな目的地を設定
         if (wanderTimer >= wanderWaitTime || (agent.pathPending == false && agent.remainingDistance <= agent.stoppingDistance))
         {
-            Vector3 newPos = GetRandomNavMeshPosition(transform.position, wanderRadius);
+            // 現在地ではなく、常に center（記憶した中心点）を基準にしてランダムな目的地を決める
+            Vector3 newPos = GetRandomNavMeshPosition(center, wanderRadius);
             agent.SetDestination(newPos);
             wanderTimer = 0f;
         }
