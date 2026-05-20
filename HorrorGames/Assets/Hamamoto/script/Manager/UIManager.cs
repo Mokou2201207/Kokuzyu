@@ -90,8 +90,21 @@ public class UIManager : MonoBehaviour
         {
             //列車
             case MissionObj.ObjType.train:
-                missionText.text="素材が足りません".ToString();
-                StartCoroutine(MissionImageOpenCoroutine());
+                //特定のアイテムを入手してるかどうか
+                if (InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Tire) >= 1 &&
+                    InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Coal) >= 1 &&
+                    InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Key) >= 1 &&
+                    InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Driver) >= 1)
+                {
+                    missionText.text = "列車の修理が完了した！";
+                    StartCoroutine(MissionImageOpenCoroutine());
+                }
+                else
+                {
+                    missionText.text = "素材が足りません";
+                    StartCoroutine(MissionImageOpenCoroutine());
+                }
+
                 break;
         }
     }
@@ -105,9 +118,9 @@ public class UIManager : MonoBehaviour
         //表示
         missionImage.gameObject.SetActive (true);
         isMissionOpen = true;
+
         yield return new WaitForSeconds(3f);
-        animator.SetTrigger("Close");
-        yield return new WaitForSeconds(1f);
+
         //非表示
         missionImage.gameObject.SetActive(false);
         isMissionOpen = false;
