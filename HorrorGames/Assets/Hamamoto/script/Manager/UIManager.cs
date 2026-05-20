@@ -22,6 +22,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text missionText;
     [SerializeField]private Animator animator;
 
+    //ミッション用のテキストを表示されているかどうか
+    public bool isMissionOpen=false;
+
     private void Start()
     {
         //アイテムが追加された時の処理
@@ -101,10 +104,12 @@ public class UIManager : MonoBehaviour
     {
         //表示
         missionImage.gameObject.SetActive (true);
+        isMissionOpen = true;
         yield return new WaitForSeconds(3f);
-
-        yield return new WaitForSeconds(3f);
+        animator.SetTrigger("Close");
+        yield return new WaitForSeconds(1f);
         //非表示
         missionImage.gameObject.SetActive(false);
+        isMissionOpen = false;
     }
 }

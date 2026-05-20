@@ -7,6 +7,9 @@ using UnityEngine.UI;
 /// </summary>
 public class Crosshairs : MonoBehaviour
 {
+    [Header("UIManagerをアタッチ"),SerializeField]
+    private UIManager uiManagerScript;
+
     [Header("クロスヘアのImage"), SerializeField]
     private Image crosshairImage;
 
@@ -20,6 +23,7 @@ public class Crosshairs : MonoBehaviour
     private float sphereRadius = 0.5f;
     [Header("Rayの距離"),SerializeField]
     private float maxDistance = 50f;
+
 
     private void Update()
     {
@@ -49,7 +53,7 @@ public class Crosshairs : MonoBehaviour
                 crosshairImage.sprite = targetSprite;
 
                 // EKeyでアイテムを入手
-                if (Input.GetKeyDown(KeyCode.E))
+                if (Input.GetKeyDown(KeyCode.E)&&!uiManagerScript.isMissionOpen)
                 {
                     mission.MissionInteract();
                 }
