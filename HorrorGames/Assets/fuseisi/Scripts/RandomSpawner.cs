@@ -11,8 +11,8 @@ public class RandomSpawner : MonoBehaviour
     public GameObject keyPrefab;
 
     [Header("生成数")]
-    public int crossCount = 10;
-    public int batteryCount = 10;
+    public int crossCount = 5;
+    public int batteryCount = 5;
 
     [Header("ランダムスポーン位置 (バッテリーと十字架用)")]
     public Transform[] randomSpawnPoints;
