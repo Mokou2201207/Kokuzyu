@@ -22,6 +22,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text missionText;
     [SerializeField]private Animator animator;
 
+    [Header("TrainRepairManagerをアタッチ")]
+    [SerializeField] private TrainRepairManager trainRepairManager;
+
     //ミッション用のテキストを表示されているかどうか
     public bool isMissionOpen=false;
 
@@ -96,8 +99,10 @@ public class UIManager : MonoBehaviour
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Key) >= 1 &&
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Driver) >= 1)
                 {
-                    missionText.text = "列車の修理が完了した！";
-                    StartCoroutine(MissionImageOpenCoroutine());
+                    if (trainRepairManager!=null)
+                    {
+                        trainRepairManager.SetCanRepair(true);
+                    }
                 }
                 else
                 {

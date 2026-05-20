@@ -56,9 +56,6 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// ミッション用のサウンド
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="count"></param>
-
     private void PlayMissionSound(MissionObj.ObjType type, int count)
     {
         AudioClip clipToPlay = null;
@@ -68,7 +65,19 @@ public class AudioManager : MonoBehaviour
         {
             //列車
             case MissionObj.ObjType.train:
-                clipToPlay = horrorPushSE;
+
+                // アイテムが全て揃っているかチェックする
+                bool hasAllItems = InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Tire) >= 1 &&
+                                   InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Coal) >= 1 &&
+                                   InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Key) >= 1 &&
+                                   InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Driver) >= 1;
+
+                // 素材が揃っていない時だけ、音をセットする
+                if (!hasAllItems)
+                {
+                    clipToPlay = horrorPushSE;
+                }
+                // 揃っている場合は音をならさない
                 break;
         }
 
@@ -78,4 +87,5 @@ public class AudioManager : MonoBehaviour
             audioSource.PlayOneShot(clipToPlay);
         }
     }
+
 }
