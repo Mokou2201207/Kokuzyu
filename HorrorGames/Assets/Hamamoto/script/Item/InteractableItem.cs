@@ -23,6 +23,8 @@ public class InteractableItem : MonoBehaviour
         Driver,
         //鍵
         Key,
+        //バッテリー
+        Battery,
     }
 
     /// <summary>

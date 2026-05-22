@@ -20,13 +20,15 @@ public class UIManager : MonoBehaviour
     [Header("ミッションテキストとImageとアニメーターをアタッチ")]
     [SerializeField] private Image missionImage;
     [SerializeField] private Text missionText;
-    [SerializeField]private Animator animator;
+    [SerializeField] private Animator animator;
 
     [Header("TrainRepairManagerをアタッチ")]
     [SerializeField] private TrainRepairManager trainRepairManager;
+    [Header("BatteryParametarManagerをアタッチ")]
+    [SerializeField] private BatteryParametarManager batteryParametarManager;
 
     //ミッション用のテキストを表示されているかどうか
-    public bool isMissionOpen=false;
+    public bool isMissionOpen = false;
 
     private void Start()
     {
@@ -77,6 +79,12 @@ public class UIManager : MonoBehaviour
                 driverIcon.color = Color.white;
                 break;
 
+            //バッテリー
+            case InteractableItem.ItemType.Battery:
+                //バッテリーを補充する処理へ
+                batteryParametarManager.SupplementBattery();
+                break;
+
         }
 
     }
@@ -99,7 +107,7 @@ public class UIManager : MonoBehaviour
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Key) >= 1 &&
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Driver) >= 1)
                 {
-                    if (trainRepairManager!=null)
+                    if (trainRepairManager != null)
                     {
                         trainRepairManager.SetCanRepair(true);
                     }
@@ -121,7 +129,7 @@ public class UIManager : MonoBehaviour
     private IEnumerator MissionImageOpenCoroutine()
     {
         //表示
-        missionImage.gameObject.SetActive (true);
+        missionImage.gameObject.SetActive(true);
         isMissionOpen = true;
 
         yield return new WaitForSeconds(3f);
