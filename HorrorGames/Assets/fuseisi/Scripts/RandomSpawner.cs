@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class RandomSpawner : MonoBehaviour
 {
@@ -23,11 +24,15 @@ public class RandomSpawner : MonoBehaviour
     public Transform driverSpawnPoint;
     public Transform keySpawnPoint;
 
+    private List<Transform> availableSpawnPoints = new List<Transform>();
+
     void Start()
     {
         // ランダムスポーン地点が設定されているか確認
         if (randomSpawnPoints != null && randomSpawnPoints.Length > 0)
         {
+            availableSpawnPoints = new List<Transform>(randomSpawnPoints);
+
             // cross
             for (int i = 0; i < crossCount; i++)
             {
@@ -54,14 +59,23 @@ public class RandomSpawner : MonoBehaviour
 
     void SpawnRandomItem(GameObject itemPrefab)
     {
-        // 10個など設定されたランダムスポーン位置から一つを選ぶ
-        int randomIndex = Random.Range(0, randomSpawnPoints.Length);
-        Transform spawnPoint = randomSpawnPoints[randomIndex];
+        if (availableSpawnPoints.Count == 0)
+        {
+            Debug.LogWarning("スポーン可能な位置が足りません（アイテムの合計数がスポーン位置の数を超えています）。");
+            return;
+        }
+
+        // 利用可能なスポーン位置からランダムに一つを選ぶ
+        int randomIndex = Random.Range(0, availableSpawnPoints.Count);
+        Transform spawnPoint = availableSpawnPoints[randomIndex];
 
         if (spawnPoint != null)
         {
             Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
         }
+
+        // 選択された位置をリストから削除し、他のアイテムと被らないようにする
+        availableSpawnPoints.RemoveAt(randomIndex);
     }
 
     void SpawnSpecificItem(GameObject itemPrefab, Transform spawnPoint)
