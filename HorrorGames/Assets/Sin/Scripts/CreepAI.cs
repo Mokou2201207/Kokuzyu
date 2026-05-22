@@ -309,4 +309,31 @@ public class CreepAI : MonoBehaviour
         // 見つからなかった場合は現在の位置を返す
         return origin;
     }
+
+    // プレイヤーを捕まえた時に外部（EnemyAttackスクリプト等）から呼ばれる処理
+    public void OnCaughtPlayer()
+    {
+        // 1. 移動を完全に止める（慣性で滑るのも防ぐ）
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero; // ピタッと止める
+        }
+        
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        // 2. 再生中の歩く音や声をピタッと止める
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+
+        // 3. このスクリプト自体の機能をOFFにして、再び足音が鳴るのを防ぐ
+        this.enabled = false;
+    }
 }
