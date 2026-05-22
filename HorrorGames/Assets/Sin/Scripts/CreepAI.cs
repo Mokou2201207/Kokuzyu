@@ -25,6 +25,25 @@ public class CreepAI : MonoBehaviour
     [Tooltip("子オブジェクトにあるAnimatorを指定（指定がない場合は自動取得）")]
     public Animator animator;
 
+    [Header("サウンド設定")]
+    [Tooltip("オーディオソース（指定がない場合は自動取得または追加）")]
+    public AudioSource audioSource;
+    [Tooltip("鳴き声の音声クリップ")]
+    public AudioClip roarClip;
+    [Tooltip("足音の音声クリップ")]
+    public AudioClip footstepClip;
+    [Tooltip("鳴き声を再生する間隔（秒）")]
+    public float roarInterval = 5f;
+    [Tooltip("足音を再生する間隔（秒）")]
+    public float footstepInterval = 0.5f;
+    [Tooltip("音が最大音量で聞こえる距離")]
+    public float soundMinDistance = 2f;
+    [Tooltip("音が聞こえなくなる最大距離")]
+    public float soundMaxDistance = 20f;
+
+    private float roarTimer;
+    private float footstepTimer;
+
     private NavMeshAgent agent;
     private float wanderTimer;
     private float stateTimer;
@@ -86,6 +105,28 @@ public class CreepAI : MonoBehaviour
         {
             rb.isKinematic = true;
         }
+
+        // オーディオソースの取得または追加
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+            }
+        }
+
+        // Unityの標準の3D音響機能ではなく、スクリプトでPlayerとの距離を直接計算して
+        // 音量を調整するため、3D設定（spatialBlend）はオフ(0)にしておきます。
+        if (audioSource != null)
+        {
+            audioSource.spatialBlend = 0f; 
+        }
+        
+        // 最初からすぐ鳴く/足音が鳴るようにタイマーを初期化（カウントダウン方式）
+        roarTimer = 0f;
+        footstepTimer = 0f;
     }
 
     void Update()
@@ -93,6 +134,26 @@ public class CreepAI : MonoBehaviour
         if (player == null) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // --- 距離に応じた音量の自動調整（明示的なスクリプト制御） ---
+        if (audioSource != null)
+        {
+            if (distanceToPlayer <= soundMinDistance)
+            {
+                audioSource.volume = 1f; // 近い時は最大音量
+            }
+            else if (distanceToPlayer >= soundMaxDistance)
+            {
+                audioSource.volume = 0f; // 遠い時は無音
+            }
+            else
+            {
+                // MinとMaxの間で、距離が離れるほど徐々に音量を下げる（割合計算）
+                audioSource.volume = 1f - ((distanceToPlayer - soundMinDistance) / (soundMaxDistance - soundMinDistance));
+            }
+        }
+
+        HandleAudio();
 
         if (distanceToPlayer <= chaseDistance)
         {
@@ -149,6 +210,57 @@ public class CreepAI : MonoBehaviour
                 Wander(wanderCenter);
                 SetAnimation(false);
             }
+        }
+    }
+
+    void HandleAudio()
+    {
+        if (audioSource == null) return;
+
+        // 足音の処理：Agentが動いている時のみ再生
+        if (agent.velocity.sqrMagnitude > 0.1f)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                if (footstepClip != null)
+                {
+                    audioSource.PlayOneShot(footstepClip);
+                    // クリップの長さ ＋ インターバルの時間だけ待つ（確実に1回鳴り終わってから次を鳴らす）
+                    footstepTimer = footstepClip.length + footstepInterval;
+                }
+                else
+                {
+                    footstepTimer = footstepInterval;
+                }
+            }
+        }
+        else
+        {
+            footstepTimer = 0f; // 動き出したらすぐに鳴るようにリセット
+        }
+
+        // 鳴き声の処理：追跡中（アニメーションがChange=trueの時）に定期的に再生
+        if (currentAnimState)
+        {
+            roarTimer -= Time.deltaTime;
+            if (roarTimer <= 0f)
+            {
+                if (roarClip != null)
+                {
+                    audioSource.PlayOneShot(roarClip);
+                    // クリップの長さ ＋ インターバルの時間だけ待つ（確実に1回鳴り終わってから次を鳴らす）
+                    roarTimer = roarClip.length + roarInterval;
+                }
+                else
+                {
+                    roarTimer = roarInterval;
+                }
+            }
+        }
+        else
+        {
+            roarTimer = 0f; // 追跡を開始したらすぐに鳴くようにリセット
         }
     }
 
