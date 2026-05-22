@@ -13973,6 +13973,7 @@ MonoBehaviour:
   missionText: {fileID: 1710210548}
   animator: {fileID: 0}
   trainRepairManager: {fileID: 0}
+  batteryParametarManager: {fileID: 0}
   isMissionOpen: 0
 --- !u!114 &1527960792
 MonoBehaviour:
@@ -17486,6 +17487,13 @@ MonoBehaviour:
   wanderRadius: 10
   wanderWaitTime: 2
   animator: {fileID: 1518758275}
+  audioSource: {fileID: 0}
+  roarClip: {fileID: 0}
+  footstepClip: {fileID: 0}
+  roarInterval: 5
+  footstepInterval: 0.5
+  soundMinDistance: 2
+  soundMaxDistance: 20
 --- !u!195 &1864014175
 NavMeshAgent:
   m_ObjectHideFlags: 0
