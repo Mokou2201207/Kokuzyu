@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 /// <summary>
 /// クロスヘア処理
 /// </summary>
-public class Crosshairs : MonoBehaviour
+public class Crosshairs : NetworkBehaviour
 {
     [Header("UIManagerをアタッチ"),SerializeField]
     private UIManager uiManagerScript;
@@ -57,6 +58,7 @@ public class Crosshairs : MonoBehaviour
 
     private void Update()
     {
+        if (!isLocalPlayer) return;
         if (Camera.main == null || crosshairImage == null) return;
 
         Ray ray = Camera.main.ScreenPointToRay(crosshairImage.transform.position);

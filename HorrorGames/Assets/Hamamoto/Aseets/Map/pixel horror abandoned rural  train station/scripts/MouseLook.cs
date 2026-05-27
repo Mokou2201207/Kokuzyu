@@ -1,16 +1,20 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
+
 namespace littleDog
 {
-    public class MouseLook : MonoBehaviour
+    public class MouseLook : NetworkBehaviour
     {
         public float mouseSensitivity = 2f;
         public Transform PlayerBody;
         float Xrot = 0f;
         public static bool CanMove = true;
+        
         void Start()
         {
+            if (!isLocalPlayer) return; // 自分以外のカメラ設定は無視
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
@@ -18,6 +22,7 @@ namespace littleDog
         // Update is called once per frame
         void Update()
         {
+            if (!isLocalPlayer) return; // 自分が操作するキャラ以外は無視
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 CanMove = !CanMove;

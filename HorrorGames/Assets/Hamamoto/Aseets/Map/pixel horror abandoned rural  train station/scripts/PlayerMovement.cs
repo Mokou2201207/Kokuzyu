@@ -1,8 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-public class PlayerMovement : MonoBehaviour
+using Mirror;
+
+public class PlayerMovement : NetworkBehaviour
 {
     [Header("コンポーネントを自動でアタッチ")]
     [SerializeField] private CharacterController controller;
@@ -44,9 +46,28 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // 自分自身じゃない場合はカメラを無効化する
+        if (!isLocalPlayer)
+        {
+            if (virtualCamera != null) virtualCamera.gameObject.SetActive(false);
+            
+            // AudioListenerが付いているなら無効化（警告防止）
+            AudioListener listener = GetComponentInChildren<AudioListener>();
+            if (listener != null) listener.enabled = false;
+            
+            // MainCamera等のカメラタグがついている普通のカメラがあれば無効化
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam != null) cam.gameObject.SetActive(false);
+        }
+    }
+
 
     void Update()
     {
+        if (!isLocalPlayer) return; // 自分が操作するキャラ以外は無視
+
         if (controller.isGrounded && V.y < 0)
         {
             V.y = -2f;
