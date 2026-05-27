@@ -61,17 +61,17 @@ public class CreepAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         wanderTimer = wanderWaitTime;
 
-        // Playerという名前のオブジェクトを自動的に探して設定する
+        // Playerタグのオブジェクトを自動的に探して設定する
         if (player == null)
         {
-            GameObject playerObj = GameObject.Find("Player");
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
             {
                 player = playerObj.transform;
             }
             else
             {
-                Debug.LogWarning("Playerという名前のオブジェクトが見つかりませんでした。");
+                Debug.LogWarning("Playerタグのオブジェクトが見つかりませんでした。");
             }
         }
 

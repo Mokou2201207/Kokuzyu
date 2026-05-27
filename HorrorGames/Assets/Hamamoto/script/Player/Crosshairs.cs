@@ -3,44 +3,76 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
-/// ƒNƒƒXƒwƒAˆ—
+/// ã‚¯ãƒ­ã‚¹ãƒ˜ã‚¢å‡¦ç†
 /// </summary>
 public class Crosshairs : MonoBehaviour
 {
-    [Header("UIManager‚ğƒAƒ^ƒbƒ`"),SerializeField]
+    [Header("UIManagerã‚’ã‚¢ã‚¿ãƒƒãƒ"),SerializeField]
     private UIManager uiManagerScript;
 
-    [Header("ƒNƒƒXƒwƒA‚ÌImage"), SerializeField]
+    [Header("ã‚¯ãƒ­ã‚¹ãƒ˜ã‚¢ã®Image"), SerializeField]
     private Image crosshairImage;
 
-    [Header("’Êí‚ÌƒNƒƒXƒwƒA"), SerializeField]
+    [Header("é€šå¸¸ã®ã‚¯ãƒ­ã‚¹ãƒ˜ã‚¢"), SerializeField]
     private Sprite normalSprite;
-    [Header("ƒAƒCƒeƒ€‚Ìê‡‚ÌƒNƒƒXƒwƒA"), SerializeField]
+    [Header("ã‚¢ã‚¤ãƒ†ãƒ ã®å ´åˆã®ã‚¯ãƒ­ã‚¹ãƒ˜ã‚¢"), SerializeField]
     private Sprite targetSprite;
 
 
-    [Header("Ray‚Ì”¼Œa"), SerializeField]
+    [Header("Rayã®åŠå¾„"), SerializeField]
     private float sphereRadius = 0.5f;
-    [Header("Ray‚Ì‹——£"),SerializeField]
+    [Header("Rayã®è·é›¢"),SerializeField]
     private float maxDistance = 50f;
 
+    private void Start()
+    {
+        if (uiManagerScript == null)
+        {
+            uiManagerScript = FindObjectOfType<UIManager>();
+        }
+
+        if (crosshairImage == null)
+        {
+            GameObject crosshairObj = GameObject.Find("Crosshairs");
+            if (crosshairObj == null) crosshairObj = GameObject.Find("Crosshair");
+            
+            if (crosshairObj != null)
+            {
+                crosshairImage = crosshairObj.GetComponent<Image>();
+            }
+            else
+            {
+                Image[] images = FindObjectsOfType<Image>(true);
+                foreach (Image img in images)
+                {
+                    if (img.gameObject.name.ToLower().Contains("crosshair"))
+                    {
+                        crosshairImage = img;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     private void Update()
     {
+        if (Camera.main == null || crosshairImage == null) return;
+
         Ray ray = Camera.main.ScreenPointToRay(crosshairImage.transform.position);
         RaycastHit hit;
 
-        // SphereCast‚ğÀs
+        // SphereCastã‚’å®Ÿè¡Œ
         if (Physics.SphereCast(ray, sphereRadius, out hit, maxDistance))
         {
             Debug.DrawRay(ray.origin, ray.direction * maxDistance, Color.red);
-            //ƒAƒCƒeƒ€‚É“–‚½‚Á‚Ä‚é‚Æ‚«
+            //ã‚¢ã‚¤ãƒ†ãƒ ã«å½“ãŸã£ã¦ã‚‹ã¨ã
             if (hit.collider.TryGetComponent<InteractableItem>(out var item))
             {
-                //ƒXƒvƒ‰ƒCƒg•ÏŠ·
+                //ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå¤‰æ›
                crosshairImage.sprite=targetSprite;
 
-                // EKey‚ÅƒAƒCƒeƒ€‚ğ“üè
+                // EKeyã§ã‚¢ã‚¤ãƒ†ãƒ ã‚’å…¥æ‰‹
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     item.ItemInteract();
@@ -49,10 +81,10 @@ public class Crosshairs : MonoBehaviour
             }
             else if(hit.collider.TryGetComponent<MissionObj>(out var mission))
             {
-                //ƒXƒvƒ‰ƒCƒg•ÏŠ·
+                //ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå¤‰æ›
                 crosshairImage.sprite = targetSprite;
 
-                // EKey‚ÅƒAƒCƒeƒ€‚ğ“üè
+                // EKeyã§ã‚¢ã‚¤ãƒ†ãƒ ã‚’å…¥æ‰‹
                 if (Input.GetKeyDown(KeyCode.E)&&!uiManagerScript.isMissionOpen)
                 {
                     mission.MissionInteract();
@@ -60,11 +92,11 @@ public class Crosshairs : MonoBehaviour
             }
             else
             {
-                //ƒXƒvƒ‰ƒCƒg•ÏŠ·
+                //ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆå¤‰æ›
                 crosshairImage.sprite = normalSprite;
             }
         }
-        //‚à‚Ì‚ª‚Ü‚¸‚È‚É‚à“–‚½‚Á‚Ä‚È‚¢
+        //ã‚‚ã®ãŒã¾ãšãªã«ã‚‚å½“ãŸã£ã¦ãªã„æ™‚
         else
         {
             crosshairImage.sprite = normalSprite;
