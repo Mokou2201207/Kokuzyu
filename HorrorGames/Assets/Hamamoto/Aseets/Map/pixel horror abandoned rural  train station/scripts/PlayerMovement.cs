@@ -68,9 +68,18 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!isLocalPlayer) return; // 自分が操作するキャラ以外は無視
 
-        if (controller.isGrounded && V.y < 0)
+        // 毎フレーム1度だけ接地判定を取得
+        bool isGrounded = controller.isGrounded;
+
+        if (isGrounded && V.y < 0)
         {
             V.y = -2f;
+        }
+
+        // ジャンプの入力判定 (Moveの前に持ってくることで、Moveによる接地判定のズレを防ぐ)
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            V.y = Mathf.Sqrt(JumpHight * -2f * gravity);
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -78,8 +87,28 @@ public class PlayerMovement : NetworkBehaviour
 
         Vector3 move = transform.right * x + transform.forward * z;
 
-        //移動かつ地面を踏んでいたら
-        if (move.magnitude > 0.1f&& controller.isGrounded)
+        // スピードの設定（空中でも移動できるようにする）
+        if (move.magnitude > 0.1f)
+        {
+            if (Input.GetKey(KeyCode.LeftShift) && !sutaminaParameterManagerScript.isExhausted)
+            {
+                sutaminaParameterManagerScript.isRun = true;
+                speed = runSpeed;
+            }
+            else
+            {
+                sutaminaParameterManagerScript.isRun = false;
+                speed = walkSpeed;
+            }
+        }
+        else
+        {
+            sutaminaParameterManagerScript.isRun = false;
+            speed = 0f;
+        }
+
+        // 移動かつ地面を踏んでいたら（足音とカメラの揺れの処理）
+        if (move.magnitude > 0.1f && isGrounded)
         {
             // まだ音が鳴っていなければ再生を開始
             if (!audioSource.isPlaying)
@@ -87,66 +116,42 @@ public class PlayerMovement : NetworkBehaviour
                 audioSource.Play();
             }
 
-            //shiftで移動速度変化
-            if (Input.GetKey(KeyCode.LeftShift)&&!sutaminaParameterManagerScript.isExhausted)
+            audioSource.clip = moveSE;
+
+            if (sutaminaParameterManagerScript.isRun)
             {
-                //走っているフラグオン
-                sutaminaParameterManagerScript.isRun = true;
-
-                //移動音を再生
-                audioSource.clip = moveSE;
                 audioSource.pitch = 1.3f;
-
-                //画面の揺れも変化
                 //揺れの大きさ
                 noise.m_AmplitudeGain = 1.3f;
                 //揺れの速さ
                 noise.m_FrequencyGain = 0.3f;
-
-                speed = runSpeed;
             }
             else
             {
-                //走っているフラグオフ
-                sutaminaParameterManagerScript.isRun = false;
-
-                //移動音を再生
-                audioSource.clip = moveSE;
                 audioSource.pitch = 1.0f;
-
-                //画面の揺れも変化
                 //揺れの大きさ
                 noise.m_AmplitudeGain = 0.7f;
                 //揺れの速さ
                 noise.m_FrequencyGain = 0.3f;
-
-                speed = walkSpeed;
             }
         }
         else
         {
-            // 止まっている、または空中にいる時は音を止める
+            // 止まっている、または空中にいる時は音と揺れを止める
             if (audioSource.isPlaying)
             {
                 audioSource.Stop();
             }
             noise.m_AmplitudeGain = 0.3f; 
             noise.m_FrequencyGain = 0.1f;
-            speed = 0f;
         }
 
-
-
-        // 移動実行
-        controller.Move(move * speed * Time.deltaTime);
-
-        //ジャンプ
-        if (Input.GetButtonDown("Jump"))
-        {
-            V.y = Mathf.Sqrt(JumpHight * -2f * gravity);
-        }
+        // 重力適用
         V.y += gravity * Time.deltaTime;
-        controller.Move(V * Time.deltaTime);
+
+        // 横移動と重力・ジャンプをまとめて1回のMoveで実行する
+        Vector3 finalVelocity = move * speed + Vector3.up * V.y;
+        controller.Move(finalVelocity * Time.deltaTime);
     }
 
 }
