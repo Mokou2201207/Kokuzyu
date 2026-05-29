@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 8620938098656915090}
   - component: {fileID: 8201788353995405017}
   - component: {fileID: 5527486936770360404}
+  - component: {fileID: -8475878329213402665}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -267,6 +268,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 925984a65b5a1f045ae28c3ce8dcc0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   controller: {fileID: 0}
   audioSource: {fileID: 0}
   virtualCamera: {fileID: 4709655611419962999}
@@ -384,6 +388,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ab14c9bc2efcad459709b80fd026ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   uiManagerScript: {fileID: 0}
   crosshairImage: {fileID: 0}
   normalSprite: {fileID: 21300000, guid: 1c6fb9045f2e8b148896fe5c96e02d36, type: 3}
@@ -402,13 +409,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6800d1b6ffed343bd8d6c59e380556, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   sutaminaSlider: {fileID: 0}
   decreaseSpeed: 0.1
   sutaminaHeelTime: 3
   dizzinessBackground: {fileID: 0}
   metarAnimator: {fileID: 0}
   shortnesAnimator: {fileID: 0}
-  audioSource: {fileID: 0}
+  audioSource: {fileID: -8475878329213402665}
   shortnessSE: {fileID: 8300000, guid: 15a3ad354e7840441978102979135037, type: 3}
   isRun: 0
   isStaminaFull: 1
@@ -464,6 +474,102 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!82 &-8475878329213402665
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385580095606490818}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.5
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4472864494062923571
 GameObject:
   m_ObjectHideFlags: 0
@@ -572,6 +678,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5fa7717414bbf54189ac33309b72b58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   batterySlider: {fileID: 0}
   batteryConsumptionTime: 180
   deadBatteryFogDensity: 0.5
@@ -768,6 +877,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f5f2618844127b43808bcd77cb5a600, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   mouseSensitivity: 30
   PlayerBody: {fileID: 8993850683660721877}
 --- !u!1 &7038433161281559395

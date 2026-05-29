@@ -2,55 +2,76 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 /// <summary>
-/// ƒpƒ‰ƒ[ƒ^ˆ—
+/// ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å‡¦ç†
 /// </summary>
-public class SutaminaParameterManager : MonoBehaviour
+public class SutaminaParameterManager : NetworkBehaviour
 {
-    [Header("ƒXƒ^ƒ~ƒi‚ÌƒXƒ‰ƒCƒ_"), SerializeField]
+    [Header("ã‚¹ã‚¿ãƒŸãƒŠã®ã‚¹ãƒ©ã‚¤ãƒ€"), SerializeField]
     private Slider sutaminaSlider;
-    [Header("ƒXƒ^ƒ~ƒi‚ªˆê•bŠÔ‚ÉŒ¸‚é—Ê"), SerializeField]
+    [Header("ã‚¹ã‚¿ãƒŸãƒŠãŒä¸€ç§’é–“ã«æ¸›ã‚‹é‡"), SerializeField]
     private float decreaseSpeed = 0.2f;
-    [Header("ƒXƒ^ƒ~ƒi‚ª‰ñ•œ‚·‚éŠÔ"), SerializeField]
+    [Header("ã‚¹ã‚¿ãƒŸãƒŠãŒå›å¾©ã™ã‚‹é–“"), SerializeField]
     private float sutaminaHeelTime = 3f;
-    [Header("‹ŠE‚ªˆÃ‚­‚È‚éƒpƒlƒ‹"), SerializeField]
+    [Header("è¦–ç•ŒãŒæš—ããªã‚‹ãƒ‘ãƒãƒ«"), SerializeField]
     private Image dizzinessBackground;
 
-    [Header("ƒ[ƒ^[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒAƒ^ƒbƒ`"), SerializeField]
+    [Header("ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ã‚¿ãƒƒãƒ"), SerializeField]
     private Animator metarAnimator;
-    [Header("‹ŠE‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒAƒ^ƒbƒ`"), SerializeField]
+    [Header("è¦–ç•Œã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¢ã‚¿ãƒƒãƒ"), SerializeField]
     private Animator shortnesAnimator;
 
-    [Header("ƒRƒ“ƒ|[ƒlƒ“ƒg‚ÍƒLƒƒƒ“ƒoƒX‚©‚ç"), SerializeField]
+    [Header("ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã¯ã‚­ãƒ£ãƒ³ãƒã‚¹ã‹ã‚‰"), SerializeField]
     private AudioSource audioSource;
 
-    [Header("‘§Ø‚êSE")]
+    [Header("æ¯åˆ‡ã‚ŒSE")]
     [SerializeField] private AudioClip shortnessSE;
 
-    // ‰ñ•œ‚Ü‚Å‚ÌƒJƒEƒ“ƒgƒ_ƒEƒ“—pƒ^ƒCƒ}[
+    // å›å¾©ã¾ã§ã®ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ç”¨ã‚¿ã‚¤ãƒãƒ¼
     private float recoveryTimer = 0f;
 
-    //¡‘–‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
+    //ä»Šèµ°ã£ã¦ã„ã‚‹ã‹ã©ã†ã‹
     public bool isRun = false;
-    //ƒQ[ƒW‚ª–ƒ^ƒ“‚©‚Ç‚¤‚©
+    //ã‚²ãƒ¼ã‚¸ãŒæº€ã‚¿ãƒ³ã‹ã©ã†ã‹
     [SerializeField] private bool isStaminaFull = true;
-    //‘§Ø‚ê‚µ‚Ä‰ñ•œ‘Ò‚¿‚©‚Ç‚¤‚©
+    //æ¯åˆ‡ã‚Œã—ã¦å›å¾©å¾…ã¡ã‹ã©ã†ã‹
     public bool isExhausted = false;
 
 
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.sutaminaParameterManager = this;
+            if (sutaminaSlider == null) sutaminaSlider = UIManager.instance.sutaminaSliderUI;
+            if (dizzinessBackground == null) dizzinessBackground = UIManager.instance.dizzinessBackgroundUI;
+            if (metarAnimator == null) metarAnimator = UIManager.instance.metarAnimatorUI;
+            if (shortnesAnimator == null) shortnesAnimator = UIManager.instance.shortnesAnimatorUI;
+
+            if (sutaminaSlider != null)
+            {
+                sutaminaSlider.value = sutaminaSlider.maxValue;
+            }
+        }
+    }
+
     private void Update()
     {
+        if (!isLocalPlayer) return;
         if (sutaminaSlider == null) return;
 
-        //‘–‚Á‚Ä‚¢‚ÄA‘§Ø‚ê‚µ‚Ä‚¢‚È‚©‚Á‚½‚ç
+        //èµ°ã£ã¦ã„ã¦ã€æ¯åˆ‡ã‚Œã—ã¦ã„ãªã‹ã£ãŸã‚‰
         if (isRun && !isExhausted)
         {
-            //Œ¸‚ç‚·ˆ—
+            //æ¸›ã‚‰ã™å‡¦ç†
             sutaminaSlider.value -= decreaseSpeed * Time.deltaTime;
-            // ‘–‚Á‚Ä‚¢‚éŠÔ‚Í‰ñ•œƒ^ƒCƒ}[‚ğƒŠƒZƒbƒg‚µ‘±‚¯‚é
+            // èµ°ã£ã¦ã„ã‚‹é–“ã¯å›å¾©ã‚¿ã‚¤ãƒãƒ¼ã‚’ãƒªã‚»ãƒƒãƒˆã—ç¶šã‘ã‚‹
             recoveryTimer = 0f;
 
-            //ƒQ[ƒW‚ª’ê‚Â‚¢‚½‚ç
+            //ã‚²ãƒ¼ã‚¸ãŒåº•ã¤ã„ãŸã‚‰
             if (sutaminaSlider.value <= 0.0f)
             {
                 sutaminaSlider.value = 0.0f;
@@ -60,30 +81,30 @@ public class SutaminaParameterManager : MonoBehaviour
         }
         else if (!isStaminaFull)
         {
-            // ƒ^ƒCƒ}[‚ğƒJƒEƒ“ƒgƒAƒbƒv
+            // ã‚¿ã‚¤ãƒãƒ¼ã‚’ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—
             recoveryTimer += Time.deltaTime;
 
-            //‘§Ø‚ê’†‚È‚ç‚T•bA’Êí‚È‚ç‚R•b
+            //æ¯åˆ‡ã‚Œä¸­ãªã‚‰ï¼•ç§’ã€é€šå¸¸ãªã‚‰ï¼“ç§’
             float waitTime = isExhausted ? 5f : sutaminaHeelTime;
 
-            // ƒ^ƒCƒ}[‚ª–Ú•WŠÔ‚ğ’´‚¦‚½‚ç‰ñ•œŠJn
+            // ã‚¿ã‚¤ãƒãƒ¼ãŒç›®æ¨™æ™‚é–“ã‚’è¶…ãˆãŸã‚‰å›å¾©é–‹å§‹
             if (recoveryTimer >= waitTime)
             {
                 sutaminaSlider.value += 0.2f * Time.deltaTime;
 
-                // ‰ñ•œ‚ªn‚Ü‚Á‚½‚ç‘§Ø‚êó‘Ô‚Í‰ğœ‚·‚é
+                // å›å¾©ãŒå§‹ã¾ã£ãŸã‚‰æ¯åˆ‡ã‚ŒçŠ¶æ…‹ã¯è§£é™¤ã™ã‚‹
                 isExhausted = false;
             }
         }
 
-        //ƒQ[ƒW‚ª0.3ˆÈ‰º‚É‚È‚Á‚½‚çÔF‚É
+        //ã‚²ãƒ¼ã‚¸ãŒ0.3ä»¥ä¸‹ã«ãªã£ãŸã‚‰èµ¤è‰²ã«
         if (sutaminaSlider.value <= 0.3f)
         {
-            //ƒ[ƒ^‚Æ‚ß‚Ü‚¢“±“ü
+            //ãƒ¡ãƒ¼ã‚¿ã¨ã‚ã¾ã„å°å…¥
             metarAnimator.SetBool("MetarRed", true);
             shortnesAnimator.SetBool("shortnes", true);
 
-            //‘§Ø‚ê‚Ì‰¹‚ğ“ü‚ê‚é
+            //æ¯åˆ‡ã‚Œã®éŸ³ã‚’å…¥ã‚Œã‚‹
             if (shortnessSE != null && !audioSource.isPlaying)
             {
                 audioSource.clip = shortnessSE;
@@ -93,22 +114,22 @@ public class SutaminaParameterManager : MonoBehaviour
         }
         else
         {
-            ////ƒ[ƒ^‚Æ‚ß‚Ü‚¢‚ğ’â~
+            ////ãƒ¡ãƒ¼ã‚¿ã¨ã‚ã¾ã„ã‚’åœæ­¢
             metarAnimator.SetBool("MetarRed", false);
             shortnesAnimator.SetBool("shortnes", false);
 
-            //‘§Ø‚ê‚ğƒXƒgƒbƒv
+            //æ¯åˆ‡ã‚Œã‚’ã‚¹ãƒˆãƒƒãƒ—
             if (audioSource.isPlaying && audioSource.clip == shortnessSE)
             {
                 audioSource.Stop();
             }
         }
 
-        //ãŒÀE‰ºŒÀ‚Ì§ŒÀ
+        //ä¸Šé™ãƒ»ä¸‹é™ã®åˆ¶é™
         if (sutaminaSlider.value > 1.0f) sutaminaSlider.value = 1.0f;
         if (sutaminaSlider.value < 0.0f) sutaminaSlider.value = 0.0f;
 
-        //’l‚ªˆêˆÈã‚È‚ç–ƒ^ƒ“
+        //å€¤ãŒä¸€ä»¥ä¸Šãªã‚‰æº€ã‚¿ãƒ³
         isStaminaFull = (sutaminaSlider.value >= 1.0f);
     }
 }

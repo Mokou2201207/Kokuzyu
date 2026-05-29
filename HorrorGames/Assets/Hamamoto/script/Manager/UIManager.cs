@@ -4,50 +4,68 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// UIXV‚È‚Ç‚Ìˆ—
+/// UIæ›´æ–°ãªã©ã®å‡¦ç†
 /// </summary>
 public class UIManager : MonoBehaviour
 {
-    [Header("ƒ^ƒCƒ„ƒAƒCƒRƒ“")]
+    //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ–
+    public static UIManager instance;
+
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
+    }
+    [Header("ã‚¿ã‚¤ãƒ¤ã‚¢ã‚¤ã‚³ãƒ³")]
     [SerializeField] private Image tireIcon;
-    [Header("Î’YƒAƒCƒRƒ“")]
+    [Header("çŸ³ç‚­ã‚¢ã‚¤ã‚³ãƒ³")]
     [SerializeField] private Image coalIcon;
-    [Header("Œ®ƒAƒCƒRƒ“")]
+    [Header("éµã‚¢ã‚¤ã‚³ãƒ³")]
     [SerializeField] private Image keyIcon;
-    [Header("ƒhƒ‰ƒCƒo[ƒAƒCƒRƒ“")]
+    [Header("ãƒ‰ãƒ©ã‚¤ãƒãƒ¼ã‚¢ã‚¤ã‚³ãƒ³")]
     [SerializeField] private Image driverIcon;
 
-    [Header("ƒ~ƒbƒVƒ‡ƒ“ƒeƒLƒXƒg‚ÆImage‚ÆƒAƒjƒ[ƒ^[‚ğƒAƒ^ƒbƒ`")]
+    [Header("ãƒŸãƒƒã‚·ãƒ§ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã¨Imageã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’ã‚¢ã‚¿ãƒƒãƒ")]
     [SerializeField] private Image missionImage;
     [SerializeField] private Text missionText;
     [SerializeField] private Animator animator;
 
-    [Header("TrainRepairManager‚ğƒAƒ^ƒbƒ`")]
+    [Header("TrainRepairManagerã‚’ã‚¢ã‚¿ãƒƒãƒ")]
     [SerializeField] private TrainRepairManager trainRepairManager;
-    [Header("BatteryParametarManager‚ğƒAƒ^ƒbƒ`")]
-    [SerializeField] private BatteryParametarManager batteryParametarManager;
+    [Header("BatteryParametarManagerã‚’ã‚¢ã‚¿ãƒƒãƒ")]
+    public BatteryParametarManager batteryParametarManager;
+    [Header("Battery UI Reference")]
+    public Slider batterySliderUI;
+    public Animator batteryAnimatorUI;
 
-    //ƒ~ƒbƒVƒ‡ƒ“—p‚ÌƒeƒLƒXƒg‚ğ•\¦‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©
+    [Header("Sutamina UI Reference")]
+    public SutaminaParameterManager sutaminaParameterManager;
+    public Slider sutaminaSliderUI;
+    public Image dizzinessBackgroundUI;
+    public Animator metarAnimatorUI;
+    public Animator shortnesAnimatorUI;
+
+    //ãƒŸãƒƒã‚·ãƒ§ãƒ³ç”¨ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹
     public bool isMissionOpen = false;
 
     private void Start()
     {
-        //ƒAƒCƒeƒ€‚ª’Ç‰Á‚³‚ê‚½‚Ìˆ—
+        //ã‚¢ã‚¤ãƒ†ãƒ ãŒè¿½åŠ ã•ã‚ŒãŸæ™‚ã®å‡¦ç†
         InventoryManager.instance.OnItemAdded += UpdateItemUI;
         InventoryManager.instance.OnMissionObj += UpdateMissionUI;
 
-        //Å‰‚Í‰æ‘œ‚Í•‚­
+        //æœ€åˆã¯ç”»åƒã¯é»’ã
         tireIcon.color = Color.black;
         keyIcon.color = Color.black;
         coalIcon.color = Color.black;
         driverIcon.color = Color.black;
 
-        //”ñ•\¦
+        //éè¡¨ç¤º
         missionImage.gameObject.SetActive(false);
     }
 
     /// <summary>
-    /// æ“¾‚µ‚½ƒAƒCƒeƒ€‚É‚æ‚Á‚ÄUI‚ğ•Ï‰»
+    /// å–å¾—ã—ãŸã‚¢ã‚¤ãƒ†ãƒ ã«ã‚ˆã£ã¦UIã‚’å¤‰åŒ–
     /// </summary>
     /// <param name="type"></param>
     /// <param name="count"></param>
@@ -55,34 +73,34 @@ public class UIManager : MonoBehaviour
     {
         switch (type)
         {
-            //ƒ^ƒCƒ„
+            //ã‚¿ã‚¤ãƒ¤
             case InteractableItem.ItemType.Tire:
-                //F‚ğŒ³‚ÌF‚É–ß‚·
+                //è‰²ã‚’å…ƒã®è‰²ã«æˆ»ã™
                 tireIcon.color = Color.white;
                 break;
 
-            //Î’Y
+            //çŸ³ç‚­
             case InteractableItem.ItemType.Coal:
-                //F‚ğŒ³‚ÌF‚É–ß‚·
+                //è‰²ã‚’å…ƒã®è‰²ã«æˆ»ã™
                 coalIcon.color = Color.white;
                 break;
 
-            //Œ®
+            //éµ
             case InteractableItem.ItemType.Key:
-                //F‚ğŒ³‚ÌF‚É–ß‚·
+                //è‰²ã‚’å…ƒã®è‰²ã«æˆ»ã™
                 keyIcon.color = Color.white;
                 break;
 
-            //ƒhƒ‰ƒCƒo[
+            //ãƒ‰ãƒ©ã‚¤ãƒãƒ¼
             case InteractableItem.ItemType.Driver:
-                //F‚ğŒ³‚ÌF‚É–ß‚·
+                //è‰²ã‚’å…ƒã®è‰²ã«æˆ»ã™
                 driverIcon.color = Color.white;
                 break;
 
-            //ƒoƒbƒeƒŠ[
+            //ãƒãƒƒãƒ†ãƒªãƒ¼
             case InteractableItem.ItemType.Battery:
-                //ƒoƒbƒeƒŠ[‚ğ•â[‚·‚éˆ—‚Ö
-                batteryParametarManager.SupplementBattery();
+                //ãƒãƒƒãƒ†ãƒªãƒ¼ã‚’è£œå……ã™ã‚‹å‡¦ç†ã¸
+                if (batteryParametarManager != null) batteryParametarManager.SupplementBattery();
                 break;
 
         }
@@ -91,7 +109,7 @@ public class UIManager : MonoBehaviour
 
 
     /// <summary>
-    /// ‘I‘ğ‚µ‚½ƒ~ƒbƒVƒ‡ƒ“‚É‚æ‚Á‚ÄUI‚ğ•Ï‰»
+    /// é¸æŠã—ãŸãƒŸãƒƒã‚·ãƒ§ãƒ³ã«ã‚ˆã£ã¦UIã‚’å¤‰åŒ–
     /// </summary>
     /// <param name="type"></param>
     /// <param name="count"></param>
@@ -99,9 +117,9 @@ public class UIManager : MonoBehaviour
     {
         switch (type)
         {
-            //—ñÔ
+            //åˆ—è»Š
             case MissionObj.ObjType.train:
-                //“Á’è‚ÌƒAƒCƒeƒ€‚ğ“üè‚µ‚Ä‚é‚©‚Ç‚¤‚©
+                //ç‰¹å®šã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’å…¥æ‰‹ã—ã¦ã‚‹ã‹ã©ã†ã‹
                 if (InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Tire) >= 1 &&
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Coal) >= 1 &&
                     InventoryManager.instance.GetItemCount(InteractableItem.ItemType.Key) >= 1 &&
@@ -114,7 +132,7 @@ public class UIManager : MonoBehaviour
                 }
                 else
                 {
-                    missionText.text = "‘fŞ‚ª‘«‚è‚Ü‚¹‚ñ";
+                    missionText.text = "ç´ æãŒè¶³ã‚Šã¾ã›ã‚“";
                     StartCoroutine(MissionImageOpenCoroutine());
                 }
 
@@ -123,18 +141,18 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒ~ƒbƒVƒ‡ƒ“Image—p‚ÌƒRƒ‹[ƒ`ƒ“
+    /// ãƒŸãƒƒã‚·ãƒ§ãƒ³Imageç”¨ã®ã‚³ãƒ«ãƒ¼ãƒãƒ³
     /// </summary>
     /// <returns></returns>
     private IEnumerator MissionImageOpenCoroutine()
     {
-        //•\¦
+        //è¡¨ç¤º
         missionImage.gameObject.SetActive(true);
         isMissionOpen = true;
 
         yield return new WaitForSeconds(3f);
 
-        //”ñ•\¦
+        //éè¡¨ç¤º
         missionImage.gameObject.SetActive(false);
         isMissionOpen = false;
     }

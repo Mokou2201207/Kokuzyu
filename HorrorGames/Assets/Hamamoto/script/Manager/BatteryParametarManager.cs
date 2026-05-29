@@ -2,95 +2,120 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 /// <summary>
-/// ƒoƒbƒeƒŠ[‚ÌÁ”ï‚È‚Ç‚Ìˆ—
+/// ãƒãƒƒãƒ†ãƒªãƒ¼ã®æ¶ˆè²»ãªã©ã®å‡¦ç†
 /// </summary>
-public class BatteryParametarManager : MonoBehaviour
+public class BatteryParametarManager : NetworkBehaviour
 {
-    [Header("ƒoƒbƒeƒŠ[ƒXƒ‰ƒCƒ_["), SerializeField]
+    [Header("ãƒãƒƒãƒ†ãƒªãƒ¼ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼"), SerializeField]
     private Slider batterySlider;
 
-    [Header("ƒoƒbƒeƒŠ‚ª‚ÂŠÔ"), SerializeField]
+    [Header("ãƒãƒƒãƒ†ãƒªãŒæŒã¤æ™‚é–“"), SerializeField]
     private float batteryConsumptionTime = 180f;
 
-    [Header("ƒoƒbƒeƒŠ[Ø‚ê‚Ì–¶‚Ì”Z‚³")]
+    [Header("ãƒãƒƒãƒ†ãƒªãƒ¼åˆ‡ã‚Œæ™‚ã®éœ§ã®æ¿ƒã•")]
     [SerializeField] private float deadBatteryFogDensity = 0.5f;
 
-    [Header("ƒoƒbƒeƒŠ[‚ğ•â[‚·‚éSE")]
+    [Header("ãƒãƒƒãƒ†ãƒªãƒ¼ã‚’è£œå……ã™ã‚‹SE")]
     [SerializeField] private AudioClip supplementBatterySE;
-    [Header("[“d‚ªØ‚ê‚éSE")]
+    [Header("å……é›»ãŒåˆ‡ã‚Œã‚‹SE")]
     [SerializeField] private AudioClip deadBatterySE;
-    [Header("ƒQ[ƒW‚ªÔ‚­‚È‚éƒAƒjƒ[ƒVƒ‡ƒ“")]
+    [Header("ã‚²ãƒ¼ã‚¸ãŒèµ¤ããªã‚‹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³")]
     [SerializeField] private Animator animator;
 
-    [Header("ƒRƒ“ƒ|[ƒlƒ“ƒg©“®")]
+    [Header("ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆè‡ªå‹•")]
     [SerializeField] private Light flashlight;
     [SerializeField] private AudioSource audioSource;
 
-    //ƒoƒbƒeƒŠ‚ª‚»‚±‚ğ•t‚¢‚½‚©‚Ç‚¤‚©
+    //ãƒãƒƒãƒ†ãƒªãŒãã“ã‚’ä»˜ã„ãŸã‹ã©ã†ã‹
     private bool isBatteryDead = false;
 
     private void Start()
     {
-        //Ši”[
+        //æ ¼ç´
         flashlight = GetComponent<Light>();
         audioSource = GetComponent<AudioSource>();
 
-        //ƒQ[ƒ€ŠJn‚ÉƒXƒ‰ƒCƒ_[‚ğMAX‚É‚µ‚Ä‚¨‚­
+
+
+        //ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚ã«ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’MAXã«ã—ã¦ãŠã
         if (batterySlider != null)
         {
             batterySlider.value = batterySlider.maxValue;
         }
     }
 
+    /// <summary>
+    /// è‡ªåˆ†ã ã‘æœ€åˆã«ã‚¢ã‚¿ãƒƒãƒã•ã›ã‚‹â€»æ··åˆã•ã›ãªã„ãŸã‚
+    /// </summary>
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        //ã‚¢ã‚¿ãƒƒãƒã•ã›ã‚‹
+        if (UIManager.instance != null)
+        {
+            UIManager.instance.batteryParametarManager = this;
+            if (batterySlider == null) batterySlider = UIManager.instance.batterySliderUI;
+            if (animator == null) animator = UIManager.instance.batteryAnimatorUI;
+
+            if (batterySlider != null)
+            {
+                batterySlider.value = batterySlider.maxValue;
+            }
+        }
+    }
+
     private void Update()
     {
+        if (!isLocalPlayer) return;
         if (batterySlider == null) return;
-        //ƒoƒbƒeƒŠ‚ª’ê‚ğ‚Â‚¢‚Ä‚È‚¯‚ê‚ÎÁ”ï‚·‚é
+        //ãƒãƒƒãƒ†ãƒªãŒåº•ã‚’ã¤ã„ã¦ãªã‘ã‚Œã°æ¶ˆè²»ã™ã‚‹
         if (!isBatteryDead)
         {
-            //ˆê•b‚ÅŒ¸‚ç‚·‚×‚«‚Ì—Ê‚ğ“Á’è
+            //ä¸€ç§’ã§æ¸›ã‚‰ã™ã¹ãã®é‡ã‚’ç‰¹å®š
             float decreasePerSecound = batterySlider.maxValue / batteryConsumptionTime;
-            //“Á’è‚µ‚½•b”‚ÅŒ¸‚ç‚µ‚Ä‚¢‚­
+            //ç‰¹å®šã—ãŸç§’æ•°ã§æ¸›ã‚‰ã—ã¦ã„ã
             batterySlider.value -= decreasePerSecound * Time.deltaTime;
 
-            //ƒ‰ƒCƒg‚ğ•t‚¯‚é
+            //ãƒ©ã‚¤ãƒˆã‚’ä»˜ã‘ã‚‹
             if (flashlight != null)
             {
                 flashlight.enabled = true;
             }
 
-            //–¶‚ğ”Z‚­
+            //éœ§ã‚’æ¿ƒã
             RenderSettings.fogDensity =0.15f;
 
-            //ƒoƒbƒeƒŠ‚Ì’ê‚ª•t‚¢‚½‚ç
+            //ãƒãƒƒãƒ†ãƒªã®åº•ãŒä»˜ã„ãŸã‚‰
             if (batterySlider.value <= 0f)
             {
-                //“ñd–h~
+                //äºŒé‡é˜²æ­¢
                 if (!isBatteryDead)
                 {
                     //SE
                     audioSource.PlayOneShot(deadBatterySE);
                 }
 
-                // ƒ}ƒCƒiƒX‚É‚È‚ç‚È‚¢‚æ‚¤‚É0‚ÉŒÅ’è
+                // ãƒã‚¤ãƒŠã‚¹ã«ãªã‚‰ãªã„ã‚ˆã†ã«0ã«å›ºå®š
                 batterySlider.value = 0f;
                 isBatteryDead = true;
 
-                Debug.Log("ƒoƒbƒeƒŠ[‚ªØ‚ê‚Ü‚µ‚½I");
+                Debug.Log("ãƒãƒƒãƒ†ãƒªãƒ¼ãŒåˆ‡ã‚Œã¾ã—ãŸï¼");
 
-                //ƒ‰ƒCƒg‚ğÁ‚·
+                //ãƒ©ã‚¤ãƒˆã‚’æ¶ˆã™
                 if (flashlight != null)
                 {
                     flashlight.enabled = false;
                 }
 
-                //–¶‚ğ”Z‚­
+                //éœ§ã‚’æ¿ƒã
                 RenderSettings.fogDensity = deadBatteryFogDensity;
             }
         }
 
-        //ƒQ[ƒW‚ª0.2ˆÈ‰º‚É‚È‚Á‚½‚çÔF‚É
+        //ã‚²ãƒ¼ã‚¸ãŒ0.2ä»¥ä¸‹ã«ãªã£ãŸã‚‰èµ¤è‰²ã«
         if (batterySlider.value<=0.2f)
         {
             animator.SetBool("MetarRed", true);
@@ -102,7 +127,7 @@ public class BatteryParametarManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒoƒbƒeƒŠ[‚ğ•â[‚·‚éˆ—
+    /// ãƒãƒƒãƒ†ãƒªãƒ¼ã‚’è£œå……ã™ã‚‹å‡¦ç†
     /// </summary>
     public void SupplementBattery()
     {
@@ -111,7 +136,7 @@ public class BatteryParametarManager : MonoBehaviour
         //SE
         audioSource.PlayOneShot(supplementBatterySE);
 
-        //ƒoƒbƒeƒŠ[‚ğƒ}ƒbƒNƒX‚É
+        //ãƒãƒƒãƒ†ãƒªãƒ¼ã‚’ãƒãƒƒã‚¯ã‚¹ã«
         batterySlider.value = batterySlider.maxValue;
         isBatteryDead = false;
     }
