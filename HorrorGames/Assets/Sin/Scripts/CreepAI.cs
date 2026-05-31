@@ -56,24 +56,17 @@ public class CreepAI : MonoBehaviour
     private Vector3 wanderCenter;
     private bool isWanderingNow = false;
 
+    // 最寄りのプレイヤーを検索するためのタイマー
+    private float targetSearchTimer = 0f;
+    private float targetSearchInterval = 1f;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         wanderTimer = wanderWaitTime;
 
-        // Playerタグのオブジェクトを自動的に探して設定する
-        if (player == null)
-        {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
-                player = playerObj.transform;
-            }
-            else
-            {
-                Debug.LogWarning("Playerタグのオブジェクトが見つかりませんでした。");
-            }
-        }
+        // プレイヤーの初期検索
+        UpdateNearestPlayer();
 
         // Animatorが設定されていない場合、子オブジェクトから取得する
         if (animator == null)
@@ -131,6 +124,14 @@ public class CreepAI : MonoBehaviour
 
     void Update()
     {
+        // ターゲットを定期的に更新し、最も近いプレイヤーを追跡する（オンライン対応）
+        targetSearchTimer -= Time.deltaTime;
+        if (targetSearchTimer <= 0f || player == null)
+        {
+            UpdateNearestPlayer();
+            targetSearchTimer = targetSearchInterval;
+        }
+
         if (player == null) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -308,6 +309,29 @@ public class CreepAI : MonoBehaviour
 
         // 見つからなかった場合は現在の位置を返す
         return origin;
+    }
+
+    // 最も近いPlayerタグのオブジェクトを探してターゲットに設定する
+    void UpdateNearestPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        float closestDistance = Mathf.Infinity;
+        Transform closestPlayer = null;
+
+        foreach (GameObject p in players)
+        {
+            if (p != null)
+            {
+                float dist = Vector3.Distance(transform.position, p.transform.position);
+                if (dist < closestDistance)
+                {
+                    closestDistance = dist;
+                    closestPlayer = p.transform;
+                }
+            }
+        }
+
+        player = closestPlayer;
     }
 
     // プレイヤーを捕まえた時に外部（EnemyAttackスクリプト等）から呼ばれる処理

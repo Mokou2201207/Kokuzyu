@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Mirror;
 
 
 public class EnemyAttack : MonoBehaviour
@@ -122,7 +123,17 @@ public class EnemyAttack : MonoBehaviour
         // 演出が終わるまで待機
         yield return new WaitForSeconds(9f);
 
-        SceneManager.LoadScene("MainScene");
+        if (NetworkManager.singleton != null && NetworkManager.singleton.isNetworkActive)
+        {
+            if (NetworkServer.active)
+            {
+                NetworkManager.singleton.ServerChangeScene("MainScene");
+            }
+        }
+        else
+        {
+            SceneManager.LoadScene("MainScene");
+        }
 
     }
 
