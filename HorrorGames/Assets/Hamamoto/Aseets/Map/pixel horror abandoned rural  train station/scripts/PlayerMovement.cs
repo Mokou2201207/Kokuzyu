@@ -9,6 +9,7 @@ public class PlayerMovement : NetworkBehaviour
     [Header("コンポーネントを自動でアタッチ")]
     [SerializeField] private CharacterController controller;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField]private Animator animator;
 
     [Header("シネマシーンのカメラをアタッチ"),SerializeField]
     private CinemachineVirtualCamera virtualCamera;
@@ -38,6 +39,7 @@ public class PlayerMovement : NetworkBehaviour
         //格納
         controller = gameObject.GetComponent<CharacterController>();
         audioSource = gameObject.GetComponent<AudioSource>();
+        animator=gameObject.GetComponentInChildren<Animator>();
 
         if (virtualCamera != null)
         {
@@ -92,17 +94,35 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift) && !sutaminaParameterManagerScript.isExhausted)
             {
+                if (animator != null)
+                {
+                    animator.SetBool("Run", true);   // 走るをON
+                    animator.SetBool("Walk", true);  // 他は絶対にOFF
+                }
+
                 sutaminaParameterManagerScript.isRun = true;
                 speed = runSpeed;
             }
             else
             {
+                if (animator != null)
+                {
+                    animator.SetBool("Run", false);   // 走るをOFF
+                    animator.SetBool("Walk", true);  // 他は絶対にOFF
+                }
+
                 sutaminaParameterManagerScript.isRun = false;
                 speed = walkSpeed;
             }
         }
         else
         {
+            if (animator != null)
+            {
+                animator.SetBool("Run", false);   // 走るをOFF
+                animator.SetBool("Walk", false);  // 歩くをOFF
+            }
+
             sutaminaParameterManagerScript.isRun = false;
             speed = 0f;
         }
@@ -110,6 +130,12 @@ public class PlayerMovement : NetworkBehaviour
         // 移動かつ地面を踏んでいたら（足音とカメラの揺れの処理）
         if (move.magnitude > 0.1f && isGrounded)
         {
+            //走ってなければ歩くAnimation
+            if (animator!=null&& !sutaminaParameterManagerScript.isRun)
+            {
+                animator.SetBool("Walk", true);
+            }
+
             // まだ音が鳴っていなければ再生を開始
             if (!audioSource.isPlaying)
             {
@@ -137,6 +163,12 @@ public class PlayerMovement : NetworkBehaviour
         }
         else
         {
+            //歩くのを停止Animation
+            if (animator != null)
+            {
+                animator.SetBool("Walk", false);
+            }
+
             // 止まっている、または空中にいる時は音と揺れを止める
             if (audioSource.isPlaying)
             {
