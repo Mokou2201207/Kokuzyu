@@ -35,40 +35,6 @@ public class PlayerMovement : NetworkBehaviour
     private float speed;
     Vector3 V;
 
-    [Header("アニメーション手動同期用")]
-    [SyncVar(hook = nameof(OnSyncWalk))]
-    private bool syncWalk = false;
-
-    [SyncVar(hook = nameof(OnSyncRun))]
-    private bool syncRun = false;
-
-    private bool prevWalk = false;
-    private bool prevRun = false;
-
-    [Command]
-    private void CmdUpdateAnim(bool walk, bool run)
-    {
-        syncWalk = walk;
-        syncRun = run;
-    }
-
-    private void OnSyncWalk(bool oldVal, bool newVal)
-    {
-        // 自分以外のプレイヤーのアニメーションを反映
-        if (!isLocalPlayer && animator != null)
-        {
-            animator.SetBool("Walk", newVal);
-        }
-    }
-
-    private void OnSyncRun(bool oldVal, bool newVal)
-    {
-        // 自分以外のプレイヤーのアニメーションを反映
-        if (!isLocalPlayer && animator != null)
-        {
-            animator.SetBool("Run", newVal);
-        }
-    }
 
     private void Awake()
     {
@@ -221,19 +187,7 @@ public class PlayerMovement : NetworkBehaviour
         Vector3 finalVelocity = move * speed + Vector3.up * V.y;
         controller.Move(finalVelocity * Time.deltaTime);
 
-        //アニメーション手動同期処理
-        if (animator != null)
-        {
-            bool currentWalk = animator.GetBool("Walk");
-            bool currentRun = animator.GetBool("Run");
 
-            if (currentWalk != prevWalk || currentRun != prevRun)
-            {
-                CmdUpdateAnim(currentWalk, currentRun);
-                prevWalk = currentWalk;
-                prevRun = currentRun;
-            }
-        }
     }
 
 }
