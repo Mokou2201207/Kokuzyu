@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Hamamoto/Scene/MainScene.unity
+    guid: f4d58dcb73027084182439c82ba31e52
+  - enabled: 1
     path: Assets/Hamamoto/Scene/MirZiken.unity
     guid: a1656544831eb9946984dc9b4d605dfd
   m_configObjects: {}
