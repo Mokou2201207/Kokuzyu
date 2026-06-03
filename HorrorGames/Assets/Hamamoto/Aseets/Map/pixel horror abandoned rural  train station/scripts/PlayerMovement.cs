@@ -9,9 +9,9 @@ public class PlayerMovement : NetworkBehaviour
     [Header("コンポーネントを自動でアタッチ")]
     [SerializeField] private CharacterController controller;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField]private Animator animator;
+    [SerializeField] private Animator animator;
 
-    [Header("シネマシーンのカメラをアタッチ"),SerializeField]
+    [Header("シネマシーンのカメラをアタッチ"), SerializeField]
     private CinemachineVirtualCamera virtualCamera;
 
     [Header("SutaminaParameterManagerをアタッチ"), SerializeField]
@@ -41,7 +41,7 @@ public class PlayerMovement : NetworkBehaviour
         //格納
         controller = gameObject.GetComponent<CharacterController>();
         audioSource = gameObject.GetComponent<AudioSource>();
-        animator=gameObject.GetComponentInChildren<Animator>();
+        animator = gameObject.GetComponentInChildren<Animator>();
 
         if (virtualCamera != null)
         {
@@ -56,11 +56,11 @@ public class PlayerMovement : NetworkBehaviour
         if (!isLocalPlayer)
         {
             if (virtualCamera != null) virtualCamera.gameObject.SetActive(false);
-            
+
             // AudioListenerが付いているなら無効化（警告防止）
             AudioListener listener = GetComponentInChildren<AudioListener>();
             if (listener != null) listener.enabled = false;
-            
+
             // MainCamera等のカメラタグがついている普通のカメラがあれば無効化
             Camera cam = GetComponentInChildren<Camera>();
             if (cam != null) cam.gameObject.SetActive(false);
@@ -78,12 +78,24 @@ public class PlayerMovement : NetworkBehaviour
         if (isGrounded && V.y < 0)
         {
             V.y = -2f;
+            
+            // 地面に着地したらジャンプアニメーションを解除
+            if (animator != null)
+            {
+                animator.SetBool("Jump", false);
+            }
         }
 
         // ジャンプの入力判定 (Moveの前に持ってくることで、Moveによる接地判定のズレを防ぐ)
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             V.y = Mathf.Sqrt(JumpHight * -2f * gravity);
+
+            //ジャンプアニメーション
+            if (animator != null)
+            {
+                animator.SetBool("Jump", true);
+            }
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -133,7 +145,7 @@ public class PlayerMovement : NetworkBehaviour
         if (move.magnitude > 0.1f && isGrounded)
         {
             //走ってなければ歩くAnimation
-            if (animator!=null&& !sutaminaParameterManagerScript.isRun)
+            if (animator != null && !sutaminaParameterManagerScript.isRun)
             {
                 animator.SetBool("Walk", true);
             }
@@ -176,7 +188,7 @@ public class PlayerMovement : NetworkBehaviour
             {
                 audioSource.Stop();
             }
-            noise.m_AmplitudeGain = 0.3f; 
+            noise.m_AmplitudeGain = 0.3f;
             noise.m_FrequencyGain = 0.1f;
         }
 
