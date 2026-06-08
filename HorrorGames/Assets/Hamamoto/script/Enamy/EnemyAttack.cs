@@ -127,12 +127,12 @@ public class EnemyAttack : MonoBehaviour
         {
             if (NetworkServer.active)
             {
-                NetworkManager.singleton.ServerChangeScene("MainScene");
+                NetworkManager.singleton.ServerChangeScene("Main");
             }
         }
         else
         {
-            SceneManager.LoadScene("MainScene");
+            SceneManager.LoadScene("Main");
         }
 
     }
