@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1517636797043778425}
   - component: {fileID: 1621172356782141527}
+  - component: {fileID: -3374360671613530101}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -44,6 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9db9d121bd2f0a44944258503946bba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   crossPrefab: {fileID: 756096962090005728, guid: 39a665b859348ec488dbe1909f53e21d, type: 3}
   batteryPrefab: {fileID: 6553082814761447148, guid: 69cc221b7a605e342adcc75c6994e9ee, type: 3}
   tirePrefab: {fileID: 6805441030708269596, guid: 86474612b11bd7a42bc239f571fd48c9, type: 3}
@@ -52,7 +56,25 @@ MonoBehaviour:
   keyPrefab: {fileID: 5901139589931734104, guid: bdbdcd17e49b98042bee77e004015a65, type: 3}
   crossCount: 5
   batteryCount: 5
-  minX: -40
-  maxX: 40
-  minZ: -40
-  maxZ: 40
+  randomSpawnPoints: []
+  tireSpawnPoint: {fileID: 0}
+  coalSpawnPoint: {fileID: 0}
+  driverSpawnPoint: {fileID: 0}
+  keySpawnPoint: {fileID: 0}
+--- !u!114 &-3374360671613530101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885632664469669652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 4222827160
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0

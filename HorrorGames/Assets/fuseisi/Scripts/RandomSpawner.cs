@@ -1,5 +1,7 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 
 public class RandomSpawner : MonoBehaviour
 {
@@ -28,6 +30,22 @@ public class RandomSpawner : MonoBehaviour
 
     void Start()
     {
+        // サーバーが起動するのを待ってからスポーンする
+        StartCoroutine(WaitForServerAndSpawn());
+    }
+
+    /// <summary>
+    /// サーバーが起動するまで待機し、起動後にアイテムをスポーンする
+    /// </summary>
+    private IEnumerator WaitForServerAndSpawn()
+    {
+        // サーバーがactiveになるまで待つ
+        while (!NetworkServer.active)
+        {
+            yield return null;
+        }
+
+
         // ランダムスポーン地点が設定されているか確認
         if (randomSpawnPoints != null && randomSpawnPoints.Length > 0)
         {
@@ -71,7 +89,9 @@ public class RandomSpawner : MonoBehaviour
 
         if (spawnPoint != null)
         {
-            Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+            // サーバーで生成してネットワークに登録
+            GameObject item = Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+            NetworkServer.Spawn(item);
         }
 
         // 選択された位置をリストから削除し、他のアイテムと被らないようにする
@@ -83,7 +103,9 @@ public class RandomSpawner : MonoBehaviour
         // 指定された位置が設定されているか確認して生成
         if (spawnPoint != null)
         {
-            Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+            // サーバーで生成してネットワークに登録
+            GameObject item = Instantiate(itemPrefab, spawnPoint.position, spawnPoint.rotation);
+            NetworkServer.Spawn(item);
         }
         else
         {

@@ -77,7 +77,8 @@ public class Crosshairs : NetworkBehaviour
                 // EKeyでアイテムを入手
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    item.ItemInteract();
+                    //サーバーからこのアイテムを消し、全員のUIも更新
+                    CmdPickupItem(item.gameObject, item.itemType);
                 }
 
             }
@@ -104,5 +105,81 @@ public class Crosshairs : NetworkBehaviour
             crosshairImage.sprite = normalSprite;
         }
     }
-   
+
+    /// <summary>
+    /// サーバーからアイテムを削除
+    /// </summary>
+    /// <param name="itemObject"></param>
+    [Command]
+    private void CmdPickupItem(GameObject itemObject,InteractableItem.ItemType type)
+    {
+        if (itemObject == null)
+        {
+            Debug.LogError("CmdPickupItem: itemObjectがnullです。アイテムにNetworkIdentityが付いているか確認してください。");
+            return;
+        }
+
+        // NetworkIdentityがあるか確認
+        if (itemObject.GetComponent<NetworkIdentity>() != null)
+        {
+            //全員の画面から削除
+            NetworkServer.Destroy(itemObject);
+        }
+        else
+        {
+            Debug.LogWarning($"CmdPickupItem: {itemObject.name} にNetworkIdentityがありません。RpcでDestroyします。");
+            RpcDestroyItem(itemObject);
+        }
+
+        // バッテリーは拾った人だけに反映、それ以外は全員に反映
+        if (type == InteractableItem.ItemType.Battery)
+        {
+            // 拾った本人だけにUI更新を送る
+            TargetPickerOnlyUI(connectionToClient, type);
+        }
+        else
+        {
+            // 全員の画面からUIの更新をかける
+            RpcUpdateAllUI(type);
+        }
+    }
+
+    /// <summary>
+    /// NetworkIdentityがないオブジェクトを全クライアントで削除する
+    /// </summary>
+    [ClientRpc]
+    private void RpcDestroyItem(GameObject itemObject)
+    {
+        if (itemObject != null)
+        {
+            Destroy(itemObject);
+        }
+    }
+
+    /// <summary>
+    /// 拾った本人だけにUI更新を送る
+    /// </summary>
+    [TargetRpc]
+    private void TargetPickerOnlyUI(NetworkConnection target, InteractableItem.ItemType type)
+    {
+        if (InventoryManager.instance != null)
+        {
+            InventoryManager.instance.AddItem(type);
+        }
+    }
+
+    /// <summary>
+    /// サーバーから命令を受け取り全プレイヤーから実行
+    /// </summary>
+    /// <param name="type"></param>
+    [ClientRpc] 
+    private void RpcUpdateAllUI(InteractableItem.ItemType type)
+    {
+        // 全員の画面にあるインベントリマネージャーにアイテムを追加する
+        if (InventoryManager.instance != null)
+        {
+            InventoryManager.instance.AddItem(type);
+        }
+    }
 }
+

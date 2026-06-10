@@ -28,14 +28,15 @@ public class InteractableItem : MonoBehaviour
     }
 
     /// <summary>
-    /// クロスヘアの処理から実行される処理
+    /// アイテムが拾われた時に呼ばれる
     /// </summary>
-    public void ItemInteract()
+    public void OnPickedUp()
     {
-        // InventoryManagerからアイテムをとったことを流す
-        InventoryManager.instance.AddItem(itemType);
-
-        Debug.Log($"{itemName} を拾った！");
-        Destroy(gameObject);
+        // 自分のインベントリマネージャーにアイテムを追加
+        if (InventoryManager.instance != null)
+        {
+            InventoryManager.instance.AddItem(itemType);
+        }
+        Debug.Log($"{itemName} をローカルで取得しました！");
     }
 }

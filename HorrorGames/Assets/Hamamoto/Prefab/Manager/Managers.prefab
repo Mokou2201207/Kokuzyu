@@ -44,6 +44,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8616177867878853049}
     m_Modifications:
+    - target: {fileID: -3374360671613530101, guid: eff052bf67d0ba5468fc568d9ff34123, type: 3}
+      propertyPath: _assetId
+      value: 4158813558
+      objectReference: {fileID: 0}
     - target: {fileID: 885632664469669652, guid: eff052bf67d0ba5468fc568d9ff34123, type: 3}
       propertyPath: m_Name
       value: SpawnManager
@@ -91,6 +95,14 @@ PrefabInstance:
     - target: {fileID: 1621172356782141527, guid: eff052bf67d0ba5468fc568d9ff34123, type: 3}
       propertyPath: randomSpawnPoints.Array.size
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6432764127490408011, guid: eff052bf67d0ba5468fc568d9ff34123, type: 3}
+      propertyPath: _assetId
+      value: 4158813558
+      objectReference: {fileID: 0}
+    - target: {fileID: 9140302161548718683, guid: eff052bf67d0ba5468fc568d9ff34123, type: 3}
+      propertyPath: _assetId
+      value: 4158813558
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
