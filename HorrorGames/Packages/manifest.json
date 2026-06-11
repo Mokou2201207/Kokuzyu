@@ -5,6 +5,7 @@
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.feature.development": "1.0.1",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.postprocessing": "3.4.0",
     "com.unity.render-pipelines.core": "17.0.4",
     "com.unity.render-pipelines.high-definition": "17.0.4",
     "com.unity.render-pipelines.high-definition-config": "17.0.4",

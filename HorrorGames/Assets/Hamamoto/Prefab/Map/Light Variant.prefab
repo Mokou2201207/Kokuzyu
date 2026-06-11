@@ -95,6 +95,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6834758474565599828}
   m_SourcePrefab: {fileID: 100100000, guid: 049e59ffe3a9d06469e9bedc8aff211c, type: 3}
+--- !u!23 &2529469903944677073 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 9059097353730313641, guid: 049e59ffe3a9d06469e9bedc8aff211c, type: 3}
+  m_PrefabInstance: {fileID: 6819041863197997944}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2692762665791816633 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8934164275171932353, guid: 049e59ffe3a9d06469e9bedc8aff211c, type: 3}
@@ -113,8 +118,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flickerSpeed: 0.8
-  minIntensity: 0.2
+  minIntensity: 0.3
   maxIntensity: 15
+  lightObjectRenderer: {fileID: 2529469903944677073}
 --- !u!82 &6834758474565599828
 AudioSource:
   m_ObjectHideFlags: 0
