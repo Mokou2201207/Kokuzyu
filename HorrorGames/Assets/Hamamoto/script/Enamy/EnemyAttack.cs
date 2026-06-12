@@ -4,9 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Mirror;
-
-
-public class EnemyAttack : MonoBehaviour
+/// <summary>
+/// 敵に捕まったときの演出
+/// </summary>
+public class EnemyAttack : NetworkBehaviour
 {
     [Header("ターゲット設定")]
     [SerializeField] private string playerTag = "Player";
@@ -49,24 +50,55 @@ public class EnemyAttack : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤーに触れたら
+    /// プレイヤーに触れたら（サーバーでのみ判定）
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
+        if (!isServer) return; // サーバーだけが当たり判定を管理する
+
         if (other.CompareTag(playerTag) && !isAttacking)
         {
             isAttacking = true;
-            StartCoroutine(JumpscareSequence(other.gameObject));
+            
+            // 捕まえた相手のNetworkIdentityを取得
+            NetworkIdentity netId = other.GetComponent<NetworkIdentity>();
+            if (netId != null)
+            {
+                // 回線落ちを防ぐため、数値を送信する
+                RpcTriggerJumpscare(netId.netId);
+            }
+
+            // サーバー側でシーン遷移のカウントダウンを開始
+            StartCoroutine(ServerGameOverSequence());
         }
     }
 
     /// <summary>
-    /// ジャンプスケアの演出
+    /// クライアント側で演出を実行する
     /// </summary>
-    /// <param name="player"></param>
-    /// <returns></returns>
-    private IEnumerator JumpscareSequence(GameObject player)
+    [ClientRpc]
+    private void RpcTriggerJumpscare(uint caughtNetId)
+    {
+        // ネットワーク上の全オブジェクトから、捕まったプレイヤーを探す
+        if (NetworkClient.spawned.TryGetValue(caughtNetId, out NetworkIdentity caughtIdentity))
+        {
+            if (caughtIdentity.isLocalPlayer)
+            {
+                StartCoroutine(LocalJumpscareSequence(caughtIdentity.gameObject));
+            }
+            else
+            {
+                // 他の人が捕まった場合は悲鳴だけ鳴らす
+                if (jumpscareSound != null) audioSource.PlayOneShot(jumpscareSound);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 演出（捕まった本人のみ実行される）
+    /// </summary>
+    private IEnumerator LocalJumpscareSequence(GameObject player)
     {
         CreepAI creepAI = GetComponentInParent<CreepAI>();
         if (creepAI != null)
@@ -89,24 +121,38 @@ public class EnemyAttack : MonoBehaviour
                 Debug.Log("CinemachineBrainを無効化しました");
             }
 
-            // カメラを演出用の位置と向きへ瞬間移動（TP）させる
+            // カメラを演出用の位置と向きへ瞬間移動させる
             if (jumpscareCameraPos != null)
             {
                 mainCam.transform.position = jumpscareCameraPos.position;
                 mainCam.transform.rotation = jumpscareCameraPos.rotation;
                 Debug.Log("カメラをTPしました");
             }
+            else
+            {
+                // もしjumpscareCameraPosが設定されていない場合でも、強制的に敵の顔の前にカメラを移動させる
+                mainCam.transform.position = transform.position + transform.forward * 1.2f + Vector3.up * 1.5f;
+                mainCam.transform.LookAt(transform.position + Vector3.up * 1.5f);
+                Debug.Log("カメラを自動計算位置へTPしました");
+            }
         }
 
         //表示
-        gameOverPanal.gameObject.SetActive(true);
+        if (gameOverPanal != null)
+        {
+            gameOverPanal.gameObject.SetActive(true);
+        }
 
-        // プレイヤー本体を非表示にする
-        player.SetActive(false);
+        // プレイヤーの見た目だけを非表示にする（回線落ちを防ぐためSetActive(false)は使わない）
+        Renderer[] renderers = player.GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
+        {
+            r.enabled = false;
+        }
 
         Debug.Log("【演出】アニメーションとSEを再生します！");
         
-        // --- サウンド演出 ---
+        // サウンド演出
         if (boomSound != null) audioSource.PlayOneShot(boomSound);
         if (jumpscareSound != null) audioSource.PlayOneShot(jumpscareSound);
 
@@ -116,25 +162,50 @@ public class EnemyAttack : MonoBehaviour
             animator.SetTrigger(attackAnimationTrigger);
         }
 
-
         if (ringSound != null) audioSource.PlayOneShot(ringSound);
         if (heartbeatSound != null) audioSource.PlayOneShot(heartbeatSound);
+        yield return new WaitForSeconds(4f);
+    }
 
-        // 演出が終わるまで待機
-        yield return new WaitForSeconds(9f);
-
-        if (NetworkManager.singleton != null && NetworkManager.singleton.isNetworkActive)
+    /// <summary>
+    /// サーバー側で４秒待ってからシーンをリスタートする
+    /// </summary>
+    private IEnumerator ServerGameOverSequence()
+    {
+        CreepAI creepAI = GetComponentInParent<CreepAI>();
+        if (creepAI != null)
         {
-            if (NetworkServer.active)
+            creepAI.OnCaughtPlayer();
+        }
+
+        // 演出の終了を待つ
+        yield return new WaitForSeconds(4f);
+
+        // UI（真っ暗な画面）を持ったまま次のシーンに行かないように、サーバー側で非表示に戻す指示を出す
+        RpcHideGameOverPanel();
+
+        if (NetworkManager.singleton != null)
+        {
+            // Lobby（Room）の仕様に合わせて、MainではなくRoomSceneに戻す
+            NetworkRoomManager roomManager = NetworkManager.singleton as NetworkRoomManager;
+            if (roomManager != null)
             {
-                NetworkManager.singleton.ServerChangeScene("Main");
+                roomManager.ServerChangeScene(roomManager.RoomScene);
             }
         }
-        else
+    }
+
+    [ClientRpc]
+    private void RpcHideGameOverPanel()
+    {
+        if (gameOverPanal != null)
         {
-            SceneManager.LoadScene("Main");
+            gameOverPanal.gameObject.SetActive(false);
         }
 
+        // ロビー画面に戻った際にUI（ボタンなど）をクリックできるように、マウスカーソルを表示・ロック解除する
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
 }

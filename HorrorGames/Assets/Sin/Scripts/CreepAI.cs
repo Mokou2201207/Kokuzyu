@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
+using Mirror;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Rigidbody))]
-public class CreepAI : MonoBehaviour
+public class CreepAI : NetworkBehaviour
 {
     [Header("ターゲット設定")]
     [Tooltip("追いかける対象（Player）")]
@@ -49,12 +50,16 @@ public class CreepAI : MonoBehaviour
     private float stateTimer;
     private bool isChasingPhase = true; // 交互モードの時に追跡フェーズかどうか
 
-    // 現在のアニメーション状態を記憶して、無駄な呼び出しを防ぐ
+    // 現在のアニメーション状態を記憶して、無駄な呼び出しを防ぐ（同期対応）
+    [SyncVar(hook = nameof(OnAnimStateChanged))]
     private bool currentAnimState = false;
 
     // 徘徊の中心点と、現在徘徊中かどうかを判定するフラグ
     private Vector3 wanderCenter;
     private bool isWanderingNow = false;
+
+    // クライアント側でも足音を鳴らすための座標保持
+    private Vector3 lastPosition;
 
     // 最寄りのプレイヤーを検索するためのタイマー
     private float targetSearchTimer = 0f;
@@ -120,11 +125,13 @@ public class CreepAI : MonoBehaviour
         // 最初からすぐ鳴く/足音が鳴るようにタイマーを初期化（カウントダウン方式）
         roarTimer = 0f;
         footstepTimer = 0f;
+        lastPosition = transform.position;
     }
 
     void Update()
     {
         // ターゲットを定期的に更新し、最も近いプレイヤーを追跡する（オンライン対応）
+        // クライアント側も音量調整のためにターゲットとの距離を知る必要がある
         targetSearchTimer -= Time.deltaTime;
         if (targetSearchTimer <= 0f || player == null)
         {
@@ -155,6 +162,9 @@ public class CreepAI : MonoBehaviour
         }
 
         HandleAudio();
+
+        // サーバー（ホスト）のみが移動とAIの判断を行う
+        if (!isServer) return;
 
         if (distanceToPlayer <= chaseDistance)
         {
@@ -218,8 +228,12 @@ public class CreepAI : MonoBehaviour
     {
         if (audioSource == null) return;
 
-        // 足音の処理：Agentが動いている時のみ再生
-        if (agent.velocity.sqrMagnitude > 0.1f)
+        // サーバー・クライアント共通で動いているか判定するため、座標の変化を見る
+        float speed = (transform.position - lastPosition).magnitude / Time.deltaTime;
+        lastPosition = transform.position;
+
+        // 足音の処理：Agentが動いている、または座標が変化している時のみ再生
+        if (speed > 0.1f || (agent != null && agent.velocity.sqrMagnitude > 0.1f))
         {
             footstepTimer -= Time.deltaTime;
             if (footstepTimer <= 0f)
@@ -274,8 +288,17 @@ public class CreepAI : MonoBehaviour
         if (currentAnimState != chaseAnim)
         {
             Debug.Log($"【アニメーション切り替え】Change = {chaseAnim} に変更しました！");
-            animator.SetBool("Change", chaseAnim);
-            currentAnimState = chaseAnim;
+            currentAnimState = chaseAnim; // サーバーでSyncVarを更新
+            animator.SetBool("Change", chaseAnim); // サーバー自身にも反映
+        }
+    }
+
+    // SyncVarのフックメソッド：クライアント側でアニメーションを同期する
+    void OnAnimStateChanged(bool oldState, bool newState)
+    {
+        if (animator != null)
+        {
+            animator.SetBool("Change", newState);
         }
     }
 
