@@ -16,6 +16,13 @@ public class EnlargeTextAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     [SerializeField] private float hoverScale = 1.15f; // どのくらい大きくするか
     [SerializeField] private float duration = 0.2f;    // アニメーションの時間
 
+    [Header("AudioSouseをアタッチ自動")]
+    [SerializeField] private AudioSource audioSource;
+
+    [Header("ボタンに触れたときのSE"), SerializeField]
+    private AudioClip titleButtunActionSE;
+
+    private bool inButtunAction=false;
     private Vector3 defaultScale;
     private Button button;
 
@@ -24,9 +31,15 @@ public class EnlargeTextAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
         // ビルド時にFPSが上がりすぎてカメラが暴れるのを防ぐため、フレームレートを固定
         Application.targetFrameRate = 60;
 
+        //オブジェクトを探しアタッチ
+        GameObject audio = GameObject.Find("TitleCanvas");
+        if (audio != null)
+        {
+            audioSource = audio.GetComponent<AudioSource>();
+        }
 
         defaultScale = transform.localScale;
-
+        inButtunAction=false ;
         button = GetComponent<Button>();
     }
 
@@ -36,7 +49,12 @@ public class EnlargeTextAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     /// <param name="eventData"></param>
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!inButtunAction)
+        {
+            audioSource.PlayOneShot(titleButtunActionSE);
+        }
         transform.DOScale(defaultScale * hoverScale, duration).SetEase(Ease.OutBack);
+        inButtunAction = true;
     }
 
 
@@ -47,6 +65,7 @@ public class EnlargeTextAnimation : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerExit(PointerEventData eventData)
     {
         transform.DOScale(defaultScale, duration).SetEase(Ease.Linear);
+        inButtunAction=false;
     }
 
 
