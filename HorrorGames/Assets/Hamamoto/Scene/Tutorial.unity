@@ -1352,7 +1352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3905185130986204947, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3905185130986204947, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: targetGameplayScene
@@ -1361,6 +1361,10 @@ PrefabInstance:
     - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: RoomScene
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: onlineScene
@@ -1402,7 +1406,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NetWorkManager
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
