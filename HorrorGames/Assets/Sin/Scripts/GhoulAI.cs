@@ -37,6 +37,8 @@ public class GhoulAI : NetworkBehaviour
     [Header("攻撃設定")]
     [Tooltip("攻撃の間隔（秒）")]
     public float attackCooldown = 2f;
+    [Tooltip("攻撃モーション中に立ち止まる時間（秒）")]
+    public float attackActionDuration = 1.5f;
 
     // サーバーとクライアント間で現在の状態を同期する
     [SyncVar(hook = nameof(OnStateChanged))]
@@ -45,15 +47,18 @@ public class GhoulAI : NetworkBehaviour
     private NavMeshAgent agent;
     private Transform targetPlayer;
     private float targetSearchTimer = 0f;
-    private float attackTimer = 0f;
+    // 攻撃のクールダウンタイマー
+    private float currentAttackCooldown = 0f;
+    // 攻撃アニメーション中の硬直タイマー
+    private float attackActionTimer = 0f;
     private bool hasRoared = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        
+
         Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null) 
+        if (rb != null)
         {
             rb.isKinematic = true; // NavMeshAgentと競合しないようにする
         }
@@ -91,6 +96,12 @@ public class GhoulAI : NetworkBehaviour
 
         float distanceToPlayer = targetPlayer != null ? Vector3.Distance(transform.position, targetPlayer.position) : Mathf.Infinity;
 
+        // 全体の攻撃クールダウンを減らす（攻撃硬直中以外でカウント）
+        if (currentState != GhoulState.Attacking && currentAttackCooldown > 0f)
+        {
+            currentAttackCooldown -= Time.deltaTime;
+        }
+
         // --- 状態遷移のロジック ---
         switch (currentState)
         {
@@ -108,22 +119,20 @@ public class GhoulAI : NetworkBehaviour
                 {
                     ChangeState(GhoulState.Crying);
                 }
-                // 十分に近づいたら攻撃開始
-                else if (distanceToPlayer <= attackRange)
+                // 十分に近づき、かつクールダウンが明けていれば攻撃開始
+                else if (distanceToPlayer <= attackRange && currentAttackCooldown <= 0f)
                 {
                     ChangeState(GhoulState.Attacking);
                 }
                 break;
 
             case GhoulState.Attacking:
-                // 遠くへ離れたら諦めて泣きに戻る
-                if (targetPlayer == null || distanceToPlayer > loseSightRange)
+                // 攻撃モーション中の硬直時間を減らす
+                attackActionTimer -= Time.deltaTime;
+                if (attackActionTimer <= 0f)
                 {
-                    ChangeState(GhoulState.Crying);
-                }
-                // 攻撃範囲から出たら再び追う
-                else if (distanceToPlayer > attackRange)
-                {
+                    // 攻撃の硬直が終わったらクールダウンを開始し、追跡状態に戻る
+                    currentAttackCooldown = attackCooldown;
                     ChangeState(GhoulState.Chasing);
                 }
                 break;
@@ -145,7 +154,8 @@ public class GhoulAI : NetworkBehaviour
 
             foreach (GameObject p in players)
             {
-                if (p != null)
+                // 自分自身（または自分の親・子オブジェクト）がPlayerタグを持っている場合は除外する
+                if (p != null && p.transform.root != this.transform.root)
                 {
                     float dist = Vector3.Distance(transform.position, p.transform.position);
                     if (dist < closestDistance)
@@ -163,8 +173,21 @@ public class GhoulAI : NetworkBehaviour
     void ChangeState(GhoulState newState)
     {
         if (currentState == newState) return;
-        
+
+        Debug.Log($"【GhoulAI】状態が遷移しました: {currentState} -> {newState} / ターゲット: {(targetPlayer != null ? targetPlayer.name : "なし")}");
+
         currentState = newState;
+
+        // サーバー側で攻撃状態に遷移した瞬間の処理
+        if (newState == GhoulState.Attacking)
+        {
+            // 硬直タイマーをセット
+            attackActionTimer = attackActionDuration;
+
+            // クライアント全員に攻撃アニメーションと音声をトリガーさせる
+            RpcTriggerAttack();
+        }
+
         // サーバー側でも自身の演出を反映
         ApplyStateEffects(newState);
     }
@@ -186,7 +209,7 @@ public class GhoulAI : NetworkBehaviour
                 hasRoared = false;
                 animator.SetFloat("Speed", 0f); // 待機アニメーション（Idle）にする
                 PlayAudioLoop(cryingClip);
-                if (isServer && agent != null && agent.isOnNavMesh) 
+                if (isServer && agent != null && agent.isOnNavMesh)
                 {
                     agent.isStopped = true;
                 }
@@ -199,7 +222,7 @@ public class GhoulAI : NetworkBehaviour
                     PlayAudioOneShot(roarClip);
                     hasRoared = true;
                 }
-                if (isServer && agent != null && agent.isOnNavMesh) 
+                if (isServer && agent != null && agent.isOnNavMesh)
                 {
                     agent.isStopped = false;
                 }
@@ -231,26 +254,12 @@ public class GhoulAI : NetworkBehaviour
             case GhoulState.Attacking:
                 if (targetPlayer != null)
                 {
-                    // プレイヤーの方を振り向く
+                    // 攻撃中は移動しないが、プレイヤーの方を振り向く
                     Vector3 direction = (targetPlayer.position - transform.position).normalized;
                     direction.y = 0;
                     if (direction != Vector3.zero)
                     {
                         transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 5f);
-                    }
-
-                    // 攻撃のクールダウン処理
-                    attackTimer -= Time.deltaTime;
-                    if (attackTimer <= 0f)
-                    {
-                        // クライアント全員に攻撃アニメーションをトリガーさせる
-                        RpcTriggerAttack();
-                        
-                        if (attackClip != null)
-                        {
-                            PlayAudioOneShot(attackClip);
-                        }
-                        attackTimer = attackCooldown;
                     }
                 }
                 break;
@@ -263,6 +272,11 @@ public class GhoulAI : NetworkBehaviour
         if (animator != null)
         {
             animator.SetTrigger("Attack");
+        }
+
+        if (attackClip != null)
+        {
+            PlayAudioOneShot(attackClip);
         }
     }
 
@@ -284,7 +298,7 @@ public class GhoulAI : NetworkBehaviour
         audioSource.Stop(); // 泣き声などのループを止める
         audioSource.PlayOneShot(clip);
     }
-    
+
     // 既存システム連携用：プレイヤーを捕まえた（ゲームオーバー時など）に呼ばれる処理
     public void OnCaughtPlayer()
     {
@@ -293,7 +307,7 @@ public class GhoulAI : NetworkBehaviour
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
         }
-        
+
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
