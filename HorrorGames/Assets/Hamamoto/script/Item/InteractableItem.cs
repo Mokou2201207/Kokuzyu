@@ -25,6 +25,8 @@ public class InteractableItem : MonoBehaviour
         Key,
         //バッテリー
         Battery,
+        //十字架
+        TheCross,
     }
 
     /// <summary>

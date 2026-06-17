@@ -34,6 +34,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TrainRepairManager trainRepairManager;
     [Header("BatteryParametarManagerをアタッチ")]
     public BatteryParametarManager batteryParametarManager;
+    [Header("CurseManagerをアタッチ")]
+    public CurseManager curseManager;
+
+    [Header("Curse UI Reference")]
+    public Slider curseSliderUI;
+    public Animator curseAnimatorUI;
+
     [Header("Battery UI Reference")]
     public Slider batterySliderUI;
     public Animator batteryAnimatorUI;
@@ -102,6 +109,12 @@ public class UIManager : MonoBehaviour
                 //バッテリーを補充する処理へ
                 if (batteryParametarManager != null) batteryParametarManager.SupplementBattery();
                 break;
+
+                //十字架
+            case InteractableItem.ItemType.TheCross:
+                if (curseManager != null) curseManager.UseTheCross();
+                break;
+
 
         }
 

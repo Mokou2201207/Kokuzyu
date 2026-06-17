@@ -14,12 +14,16 @@ public class PlayerMovement : NetworkBehaviour
     [Header("シネマシーンのカメラをアタッチ"), SerializeField]
     private CinemachineVirtualCamera virtualCamera;
 
-    [Header("SutaminaParameterManagerをアタッチ"), SerializeField]
+    [Header("scriptををアタッチ"), SerializeField]
     private SutaminaParameterManager sutaminaParameterManagerScript;
+    [SerializeField]　private CurseManager curseManager;
 
     [Header("移動速度")]
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float runSpeed = 10f;
+    [Header("呪いの際の移動速度")]
+    [SerializeField] private float curseWalkSpeed = 2.5f;
+    [SerializeField] private float curseRunSpeed = 5f;
 
     [Header("重力"), SerializeField]
     private float gravity = -40f;
@@ -40,8 +44,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         //格納
         controller = gameObject.GetComponent<CharacterController>();
-        audioSource = gameObject.GetComponent<AudioSource>();
         animator = gameObject.GetComponentInChildren<Animator>();
+        curseManager = gameObject.GetComponent<CurseManager>();
 
         if (virtualCamera != null)
         {
@@ -115,7 +119,9 @@ public class PlayerMovement : NetworkBehaviour
                 }
 
                 sutaminaParameterManagerScript.isRun = true;
-                speed = runSpeed;
+                //呪いによって速度変化
+                float runspeed = curseManager.isCurseFull ? curseRunSpeed : runSpeed;
+                speed = runspeed;
             }
             else
             {
@@ -126,7 +132,9 @@ public class PlayerMovement : NetworkBehaviour
                 }
 
                 sutaminaParameterManagerScript.isRun = false;
-                speed = walkSpeed;
+                //呪いによって速度変化
+                float walkspeed = curseManager.isCurseFull ? curseWalkSpeed : walkSpeed;
+                speed = walkspeed;
             }
         }
         else

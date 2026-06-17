@@ -14,6 +14,10 @@ public class SutaminaParameterManager : NetworkBehaviour
     private float decreaseSpeed = 0.2f;
     [Header("スタミナが回復する間"), SerializeField]
     private float sutaminaHeelTime = 3f;
+    [Header("呪いがかかっていてスタミナが一秒間に減る量"), SerializeField]
+    private float curseDecreaseSpeed = 0.8f;
+    [Header("呪いがかかっていてスタミナが回復する間"), SerializeField]
+    private float curseSutaminaHeelTime = 8f;
     [Header("視界が暗くなるパネル"), SerializeField]
     private Image dizzinessBackground;
 
@@ -21,6 +25,8 @@ public class SutaminaParameterManager : NetworkBehaviour
     private Animator metarAnimator;
     [Header("視界のアニメーションアタッチ"), SerializeField]
     private Animator shortnesAnimator;
+    [Header("scriptをアタッチ"), SerializeField]
+    private CurseManager curseManager;
 
     [Header("コンポーネントはキャンバスから"), SerializeField]
     private AudioSource audioSource;
@@ -38,7 +44,6 @@ public class SutaminaParameterManager : NetworkBehaviour
     //息切れして回復待ちかどうか
     public bool isExhausted = false;
 
-
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
@@ -50,6 +55,7 @@ public class SutaminaParameterManager : NetworkBehaviour
             if (dizzinessBackground == null) dizzinessBackground = UIManager.instance.dizzinessBackgroundUI;
             if (metarAnimator == null) metarAnimator = UIManager.instance.metarAnimatorUI;
             if (shortnesAnimator == null) shortnesAnimator = UIManager.instance.shortnesAnimatorUI;
+            if (curseManager == null) curseManager = GetComponent<CurseManager>();
 
             if (sutaminaSlider != null)
             {
@@ -66,8 +72,10 @@ public class SutaminaParameterManager : NetworkBehaviour
         //走っていて、息切れしていなかったら
         if (isRun && !isExhausted)
         {
-            //減らす処理
-            sutaminaSlider.value -= decreaseSpeed * Time.deltaTime;
+            //減るスピードをフラグによって決める
+            float currentDecrease = curseManager.isCurseFull ? curseDecreaseSpeed : decreaseSpeed;
+            //減らす処理（共通）
+            sutaminaSlider.value -= currentDecrease * Time.deltaTime;
             // 走っている間は回復タイマーをリセットし続ける
             recoveryTimer = 0f;
 
@@ -84,8 +92,11 @@ public class SutaminaParameterManager : NetworkBehaviour
             // タイマーをカウントアップ
             recoveryTimer += Time.deltaTime;
 
+            //呪われているかどうかで回復量変化
+            float normalWait = curseManager.isCurseFull ? curseSutaminaHeelTime : sutaminaHeelTime;
+
             //息切れ中なら５秒、通常なら３秒
-            float waitTime = isExhausted ? 5f : sutaminaHeelTime;
+            float waitTime = isExhausted ? 5f : normalWait;
 
             // タイマーが目標時間を超えたら回復開始
             if (recoveryTimer >= waitTime)
@@ -98,7 +109,7 @@ public class SutaminaParameterManager : NetworkBehaviour
         }
 
         //ゲージが0.3以下になったら赤色に
-        if (sutaminaSlider.value <= 0.3f)
+        if (sutaminaSlider.value <= 0.3f||curseManager.isCurseFull)
         {
             //メータとめまい導入
             metarAnimator.SetBool("MetarRed", true);
