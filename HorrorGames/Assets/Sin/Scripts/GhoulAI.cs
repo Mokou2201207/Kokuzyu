@@ -72,30 +72,40 @@ public class GhoulAI : NetworkBehaviour
                 break;
 
             case GhoulState.Chasing:
-                // プレイヤーが遠くへ離れたら待機に戻る
-                if (targetPlayer == null || distanceToPlayer > loseSightRange)
+                // --- 現在の状態に応じた行動 ---
+                if (distanceToPlayer > loseSightRange)
                 {
-                    ChangeState(GhoulState.Idle);
+                    if (targetPlayer)
+                        targetPlayer = null;
+                    if (targetPlayer != null)
+                    {
+                        // 常にプレイヤーを追いかける
+                        if (agent != null && agent.isOnNavMesh)
+                        {
+                            agent.SetDestination(targetPlayer.position);
+                        }
+                    }
+                    else
+                    {
+                        // 
+                        if (agent != null && agent.isOnNavMesh)
+                        {
+                            agent.SetDestination(transform.position);
+                        }
+                        ChangeState(GhoulState.Idle);
+                    }
                 }
                 break;
         }
 
-        // --- 現在の状態に応じた行動 ---
-        if (currentState == GhoulState.Chasing && targetPlayer != null)
-        {
-            // 常にプレイヤーを追いかける
-            if (agent != null && agent.isOnNavMesh)
-            {
-                agent.SetDestination(targetPlayer.position);
-            }
-        }
+
+
     }
 
     // 定期的に最も近いプレイヤーを探す
     void UpdateTarget()
     {
         targetSearchTimer -= Time.deltaTime;
-        Debug.Log(targetSearchTimer);
 
         if (targetSearchTimer <= 0f)
         {
@@ -143,11 +153,13 @@ public class GhoulAI : NetworkBehaviour
     // アニメーションや移動のオンオフなどの見た目を適用する
     void ApplyStateEffects(GhoulState state)
     {
+        Debug.Log(state);
         switch (state)
         {
             case GhoulState.Idle:
+                Debug.Log("55555555555555555555555555");
                 if (animator != null) animator.SetFloat("Speed", 0f);
-                if (isServer && agent != null && agent.isOnNavMesh)
+                if (agent != null && agent.isOnNavMesh)
                 {
                     agent.isStopped = true;
                     agent.velocity = Vector3.zero; // ピタッと止める
@@ -156,7 +168,7 @@ public class GhoulAI : NetworkBehaviour
 
             case GhoulState.Chasing:
                 if (animator != null) animator.SetFloat("Speed", 1f);
-                if (isServer && agent != null && agent.isOnNavMesh)
+                if (agent != null && agent.isOnNavMesh)
                 {
                     agent.isStopped = false;
                 }
