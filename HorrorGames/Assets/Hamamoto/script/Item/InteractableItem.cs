@@ -27,6 +27,8 @@ public class InteractableItem : MonoBehaviour
         Battery,
         //\š‰Ë
         TheCross,
+        //ƒIƒ‹ƒS[ƒ‹
+        MusicBox,
     }
 
     /// <summary>

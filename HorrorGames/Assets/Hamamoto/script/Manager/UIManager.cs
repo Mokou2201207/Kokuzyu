@@ -55,11 +55,20 @@ public class UIManager : MonoBehaviour
     //ミッション用のテキストを表示されているかどうか
     public bool isMissionOpen = false;
 
+    [Header("インベントリ枠のImage（3つ）")]
+    [SerializeField] private Image[] inventorySlotImages = new Image[3];
+
+    [Header("アイテムタイプごとのスプライト設定")]
+    [SerializeField] private ItemSpriteEntry[] itemSprites;
+
     private void Start()
     {
         //アイテムが追加された時の処理
         InventoryManager.instance.OnItemAdded += UpdateItemUI;
         InventoryManager.instance.OnMissionObj += UpdateMissionUI;
+
+        // インベントリ枠が変化した時のUI更新
+        InventoryManager.instance.OnInventoryChanged += RefreshInventorySlotUI;
 
         //最初は画像は黒く
         tireIcon.color = Color.black;
@@ -69,6 +78,12 @@ public class UIManager : MonoBehaviour
 
         //非表示
         missionImage.gameObject.SetActive(false);
+
+        // インベントリ枠のImageを最初は非表示
+        foreach (var slotImage in inventorySlotImages)
+        {
+            if (slotImage != null) slotImage.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -115,7 +130,9 @@ public class UIManager : MonoBehaviour
                 if (curseManager != null) curseManager.UseTheCross();
                 break;
 
-
+                //オルゴール
+            case InteractableItem.ItemType.MusicBox:
+                break;
         }
 
     }
@@ -169,4 +186,55 @@ public class UIManager : MonoBehaviour
         missionImage.gameObject.SetActive(false);
         isMissionOpen = false;
     }
+
+    /// <summary>
+    /// インベントリ枠のUIをリフレッシュ
+    /// </summary>
+    private void RefreshInventorySlotUI()
+    {
+        var slots = InventoryManager.instance.inventorySlots;
+
+        for (int i = 0; i < inventorySlotImages.Length; i++)
+        {
+            if (inventorySlotImages[i] == null) continue;
+
+            if (i < slots.Count)
+            {
+                // 枠にアイテムがある場合→表示してスプライトを設定
+                inventorySlotImages[i].gameObject.SetActive(true);
+                Sprite sprite = GetSpriteForItemType(slots[i]);
+                if (sprite != null)
+                {
+                    inventorySlotImages[i].sprite = sprite;
+                }
+            }
+            else
+            {
+                // 枠にアイテムがない場合→非表示
+                inventorySlotImages[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// ItemTypeに対応するスプライトを取得
+    /// </summary>
+    private Sprite GetSpriteForItemType(InteractableItem.ItemType type)
+    {
+        foreach (var entry in itemSprites)
+        {
+            if (entry.itemType == type) return entry.sprite;
+        }
+        return null;
+    }
+}
+
+/// <summary>
+/// アイテムタイプとスプライトの対応付け用の構造体
+/// </summary>
+[System.Serializable]
+public struct ItemSpriteEntry
+{
+    public InteractableItem.ItemType itemType;
+    public Sprite sprite;
 }

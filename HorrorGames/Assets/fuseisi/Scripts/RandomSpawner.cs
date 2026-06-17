@@ -12,10 +12,12 @@ public class RandomSpawner : MonoBehaviour
     public GameObject coalPrefab;
     public GameObject driverPrefab;
     public GameObject keyPrefab;
+    public GameObject musicBoxPrefab;
 
     [Header("生成数")]
     public int crossCount = 5;
     public int batteryCount = 5;
+    public int musicBoxCount = 3;
 
     [Header("ランダムスポーン位置 (バッテリーと十字架用)")]
     public Transform[] randomSpawnPoints;
@@ -61,6 +63,12 @@ public class RandomSpawner : MonoBehaviour
             for (int i = 0; i < batteryCount; i++)
             {
                 SpawnRandomItem(batteryPrefab);
+            }
+
+            //musicBox
+            for (int i = 0; i < musicBoxCount; i++)
+            {
+                SpawnRandomItem(musicBoxPrefab);
             }
         }
         else

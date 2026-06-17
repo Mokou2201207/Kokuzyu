@@ -77,6 +77,12 @@ public class Crosshairs : NetworkBehaviour
                 // EKeyでアイテムを入手
                 if (Input.GetKeyDown(KeyCode.E))
                 {
+                    // インベントリに空きがあるかチェック（素材以外）
+                    if (InventoryManager.instance != null && !InventoryManager.instance.CanAddItem(item.itemType))
+                    {
+                        Debug.Log("インベントリがいっぱいです！拾えません。");
+                        return;
+                    }
                     //サーバーからこのアイテムを消し、全員のUIも更新
                     CmdPickupItem(item.gameObject, item.itemType);
                 }
