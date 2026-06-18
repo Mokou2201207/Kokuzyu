@@ -119,19 +119,11 @@ public class UIManager : MonoBehaviour
                 driverIcon.color = Color.white;
                 break;
 
-            //バッテリー
+            //効果を発動
             case InteractableItem.ItemType.Battery:
-                //バッテリーを補充する処理へ
-                if (batteryParametarManager != null) batteryParametarManager.SupplementBattery();
-                break;
-
-                //十字架
             case InteractableItem.ItemType.TheCross:
-                if (curseManager != null) curseManager.UseTheCross();
-                break;
-
-                //オルゴール
             case InteractableItem.ItemType.MusicBox:
+
                 break;
         }
 

@@ -20,12 +20,18 @@ public class InventoryManager : MonoBehaviour
     public List<ItemType> inventorySlots = new List<ItemType>();
     private const int MaxInventorySize = 3;
 
+    //今何番を選択しているかの変数
+    public int currentSelectedSlot = -1;
+
     //アイテム追加実行イベント
     public event Action<ItemType, int> OnItemAdded;
     public event Action<ObjType, int> OnMissionObj;
 
     // インベントリ枠が変化した時のイベント
     public event Action OnInventoryChanged;
+
+    //選択スロットが変わったときのイベント
+    public event Action<int> OnSlotSelected;
 
     private void Awake()
     {
@@ -135,5 +141,94 @@ public class InventoryManager : MonoBehaviour
             if (slot == type) count++;
         }
         return count;
+    }
+
+    /// <summary>
+    /// スロットの選択の処理
+    /// </summary>
+    /// <param name="slotIndex"></param>
+    public void SelectSlot(int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < MaxInventorySize)
+        {
+            //同じKeyを選択したならしまう
+            if (currentSelectedSlot == slotIndex)
+            {
+                currentSelectedSlot = -1;
+            }
+            //じゃなければ構える
+            else
+            {
+                currentSelectedSlot = slotIndex;
+            }
+
+            // 変更をUIに通知
+            OnSlotSelected?.Invoke(currentSelectedSlot);
+        }
+    }
+
+    /// <summary>
+    /// 選択アイテムを使用する処理
+    /// </summary>
+    public void UseSelectedItem()
+    {
+        //初期値ならなにもしない
+        if (currentSelectedSlot == -1)
+        {
+            Debug.Log("アイテムが選択されていません！数字キーで構えてください。");
+            return;
+        }
+
+        // 選択中のスロットにアイテムがあるか確認
+        if (currentSelectedSlot < inventorySlots.Count)
+        {
+            ItemType itemToUse = inventorySlots[currentSelectedSlot];
+
+            // アイテムの効果を発動
+            ExecuteItemEffect(itemToUse);
+
+            // アイテムを消費して枠から消す
+            inventorySlots.RemoveAt(currentSelectedSlot);
+
+            //使った後は初期値に戻す
+            currentSelectedSlot = -1;
+            OnSlotSelected?.Invoke(currentSelectedSlot);
+
+            //UIを更新
+            OnInventoryChanged?.Invoke();
+        }
+        else
+        {
+            Debug.Log("選択中のスロットは空です。");
+        }
+    }
+
+    /// <summary>
+    /// アイテムの効果を実際に発動する処理
+    /// </summary>
+    /// <param name="type"></param>
+    private void ExecuteItemEffect(ItemType type)
+    {
+        switch (type)
+        {
+            //バッテリー
+            case ItemType.Battery:
+                if (UIManager.instance.batteryParametarManager != null)
+                {
+                    UIManager.instance.batteryParametarManager.SupplementBattery();
+                }
+                break;
+                //十字架
+            case ItemType.TheCross:
+                if (UIManager.instance.curseManager != null)
+                {
+                    UIManager.instance.curseManager.UseTheCross();
+                }
+                break;
+            case ItemType.MusicBox:
+                //例
+                Debug.Log("オルゴールを設置しました！");
+                break;
+        }
     }
 }
