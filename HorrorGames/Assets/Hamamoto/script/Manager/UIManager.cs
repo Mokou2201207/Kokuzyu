@@ -58,6 +58,9 @@ public class UIManager : MonoBehaviour
     [Header("インベントリ枠のImage（3つ）")]
     [SerializeField] private Image[] inventorySlotImages = new Image[3];
 
+    [Header("現在装備中のアイテム表示"),SerializeField]
+    private Image equippedItemIconUI;
+
     [Header("アイテムタイプごとのスプライト設定")]
     [SerializeField] private ItemSpriteEntry[] itemSprites;
 
@@ -69,6 +72,12 @@ public class UIManager : MonoBehaviour
 
         // インベントリ枠が変化した時のUI更新
         InventoryManager.instance.OnInventoryChanged += RefreshInventorySlotUI;
+
+        //もしアイテムが選ばれた時
+        InventoryManager.instance.OnSlotSelected += UpdateEquippedItemUI;
+
+        //最初は何も持っていないので非表示にしておく
+        if (equippedItemIconUI != null) equippedItemIconUI.gameObject.SetActive(false);
 
         //最初は画像は黒く
         tireIcon.color = Color.black;
@@ -218,6 +227,33 @@ public class UIManager : MonoBehaviour
             if (entry.itemType == type) return entry.sprite;
         }
         return null;
+    }
+
+    /// <summary>
+    /// 構えているアイテムを専用のUI枠に大きく表示する
+    /// </summary>
+    /// <param name="selectedIndex"></param>
+    private void UpdateEquippedItemUI(int selectedIndex)
+    {
+        // 選択解除された時、またはインベントリの枠外の時は非表示にする
+        if (selectedIndex == -1 || selectedIndex >= InventoryManager.instance.inventorySlots.Count)
+        {
+            if (equippedItemIconUI != null) equippedItemIconUI.gameObject.SetActive(false);
+            return;
+        }
+
+        // 選択したスロットに入っているアイテムの種類を取得
+        InteractableItem.ItemType currentItem = InventoryManager.instance.inventorySlots[selectedIndex];
+
+        // アイテムに対応する画像を取得
+        Sprite sprite = GetSpriteForItemType(currentItem);
+
+        if (sprite != null && equippedItemIconUI != null)
+        {
+            // 画像をセットして、表示をオンにする！
+            equippedItemIconUI.sprite = sprite;
+            equippedItemIconUI.gameObject.SetActive(true);
+        }
     }
 }
 

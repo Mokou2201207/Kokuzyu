@@ -36,6 +36,7 @@ public class InventoryManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        currentSelectedSlot = -1; // インスペクター上での初期化ズレを防ぐために明示的に-1にする
     }
 
     /// <summary>
@@ -94,7 +95,16 @@ public class InventoryManager : MonoBehaviour
         OnItemAdded?.Invoke(type, count);
 
         // インベントリ枠UIの更新イベント発火（素材以外の場合）
-        if (!IsMaterial(type)) OnInventoryChanged?.Invoke();
+        if (!IsMaterial(type))
+        {
+            OnInventoryChanged?.Invoke();
+
+            // 最初アイテムを取ったとき、まだ何も手に持っていなければ自動で手に持つ（装備する）
+            if (currentSelectedSlot == -1)
+            {
+                SelectSlot(inventorySlots.Count - 1);
+            }
+        }
 
         // 確認用デバッグログ
         Debug.Log($"{type} の現在の個数: {count}（インベントリ残り枠: {MaxInventorySize - inventorySlots.Count}）");
@@ -151,6 +161,13 @@ public class InventoryManager : MonoBehaviour
     {
         if (slotIndex >= 0 && slotIndex < MaxInventorySize)
         {
+            // そのスロットにアイテムが入っていなければ何もしない
+            if (slotIndex >= inventorySlots.Count)
+            {
+                Debug.Log($"スロット{slotIndex}にはアイテムがありません。");
+                return;
+            }
+
             //同じKeyを選択したならしまう
             if (currentSelectedSlot == slotIndex)
             {
