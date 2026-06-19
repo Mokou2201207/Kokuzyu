@@ -137,8 +137,8 @@ public class Crosshairs : NetworkBehaviour
             RpcDestroyItem(itemObject);
         }
 
-        // バッテリーは拾った人だけに反映、それ以外は全員に反映
-        if (type == InteractableItem.ItemType.Battery)
+        // バッテリー、十字架、オルゴールは拾った人だけに反映、それ以外は全員に反映
+        if (type == InteractableItem.ItemType.Battery || type == InteractableItem.ItemType.TheCross || type == InteractableItem.ItemType.MusicBox)
         {
             // 拾った本人だけにUI更新を送る
             TargetPickerOnlyUI(connectionToClient, type);

@@ -98,12 +98,6 @@ public class InventoryManager : MonoBehaviour
         if (!IsMaterial(type))
         {
             OnInventoryChanged?.Invoke();
-
-            // 最初アイテムを取ったとき、まだ何も手に持っていなければ自動で手に持つ（装備する）
-            if (currentSelectedSlot == -1)
-            {
-                SelectSlot(inventorySlots.Count - 1);
-            }
         }
 
         // 確認用デバッグログ
