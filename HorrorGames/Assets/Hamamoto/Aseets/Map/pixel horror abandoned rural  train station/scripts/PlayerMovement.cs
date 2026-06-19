@@ -72,6 +72,9 @@ public class PlayerMovement : NetworkBehaviour
     }
 
 
+    // Wキー勝手に押される問題の対策用フラグ
+    private bool isWKeyIgnored = false;
+
     void Update()
     {
         if (!isLocalPlayer) return; // 自分が操作するキャラ以外は無視
@@ -104,6 +107,27 @@ public class PlayerMovement : NetworkBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
+
+        // --- Wキー勝手に押される（スタック）対策 ---
+        // Sキー（または下矢印キー）が押された際、Wキー（または上矢印キー）の入力信号が残っていたら無視モードに入る
+        if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && 
+            (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || z > 0.1f))
+        {
+            isWKeyIgnored = true;
+        }
+
+        // 前進キーが完全に離された（入力信号がなくなった）ら、無視モードを解除する
+        if (isWKeyIgnored && !Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.UpArrow) && z <= 0.1f)
+        {
+            isWKeyIgnored = false;
+        }
+
+        // 無視モード中は、前進の入力（z > 0）を強制的に0にする（後退はできる）
+        if (isWKeyIgnored && z > 0f)
+        {
+            z = 0f;
+        }
+        // -----------------------------------------
 
         Vector3 move = transform.right * x + transform.forward * z;
 
