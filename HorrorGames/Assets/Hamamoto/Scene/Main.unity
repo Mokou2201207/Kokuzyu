@@ -1533,6 +1533,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Creep2
       objectReference: {fileID: 0}
+    - target: {fileID: 4907239047242697928, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
+      propertyPath: m_TagString
+      value: Enamy
+      objectReference: {fileID: 0}
     - target: {fileID: 4907239047242697930, guid: 82430f94fd1381c43878fce981a5aa43, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.276211
@@ -1781,7 +1785,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: spawnPrefabs.Array.size
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: spawnPrefabs.Array.data[0]
@@ -1807,6 +1811,10 @@ PrefabInstance:
       propertyPath: spawnPrefabs.Array.data[5]
       value: 
       objectReference: {fileID: 7933123206028278501, guid: b1397ca6fe9212243b524b36c4a5a824, type: 3}
+    - target: {fileID: 6175524781776704544, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
+      propertyPath: spawnPrefabs.Array.data[6]
+      value: 
+      objectReference: {fileID: 7933123206028278501, guid: 138d5ab0a7f4e6f48875626cfa2bab7e, type: 3}
     - target: {fileID: 9064946725478175452, guid: 0815a8b5afeb76c41b09afa3f94be0be, type: 3}
       propertyPath: m_Name
       value: NetWorkManager

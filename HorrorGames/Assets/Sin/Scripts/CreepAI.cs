@@ -166,6 +166,23 @@ public class CreepAI : NetworkBehaviour
         // サーバー（ホスト）のみが移動とAIの判断を行う
         if (!isServer) return;
 
+        GameObject decoy = GameObject.FindGameObjectWithTag("Decoy");
+
+        if (decoy != null)
+        {
+            // デコイがある場合は、プレイヤーを無視してデコイへ向かう！
+            agent.SetDestination(decoy.transform.position);
+            SetAnimation(true); // 走るアニメーションにする
+
+            // デコイが壊れた直後にプレイヤーをすぐ追えるように、タイマーをリセットしておく
+            stateTimer = 0f;
+            isChasingPhase = true;
+            isWanderingNow = false;
+
+            // ★超重要：ここで return することで、下の「プレイヤーを追う処理」を全てスキップする！
+            return;
+        }
+
         if (distanceToPlayer <= chaseDistance)
         {
             // --- 範囲内の場合：常に追跡 ---

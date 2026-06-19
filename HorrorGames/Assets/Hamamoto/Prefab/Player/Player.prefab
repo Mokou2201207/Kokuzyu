@@ -518,6 +518,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  musicBoxPrefab: {fileID: 7933123206028278501, guid: 138d5ab0a7f4e6f48875626cfa2bab7e, type: 3}
 --- !u!1 &4472864494062923571
 GameObject:
   m_ObjectHideFlags: 0

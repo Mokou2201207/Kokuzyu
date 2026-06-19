@@ -29,6 +29,8 @@ public class InteractableItem : MonoBehaviour
         TheCross,
         //ƒIƒ‹ƒS[ƒ‹
         MusicBox,
+        //‹»•±Ü
+        Stimulant,
     }
 
     /// <summary>

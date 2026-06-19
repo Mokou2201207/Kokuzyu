@@ -23,6 +23,9 @@ public class InventoryManager : MonoBehaviour
     //今何番を選択しているかの変数
     public int currentSelectedSlot = -1;
 
+    //オルゴールを使用した際のイベント
+    public event Action OnUseMusicBox;
+
     //アイテム追加実行イベント
     public event Action<ItemType, int> OnItemAdded;
     public event Action<ObjType, int> OnMissionObj;
@@ -236,9 +239,13 @@ public class InventoryManager : MonoBehaviour
                     UIManager.instance.curseManager.UseTheCross();
                 }
                 break;
+                //オルゴール
             case ItemType.MusicBox:
-                //例
-                Debug.Log("オルゴールを設置しました！");
+                OnUseMusicBox?.Invoke();
+                break;
+
+                //興奮剤
+            case ItemType.Stimulant:
                 break;
         }
     }
