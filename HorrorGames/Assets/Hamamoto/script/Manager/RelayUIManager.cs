@@ -6,31 +6,36 @@ using UnityEngine.UI;
 
 public class RelayUIManager : MonoBehaviour
 {
-    [Header("UIƒp[ƒc‚Ì•R•t‚¯")]
+    [Header("UIãƒ‘ãƒ¼ãƒ„ã®ç´ä»˜ã‘")]
     public TMP_InputField joinCodeInputField;
     public TextMeshProUGUI codeDisplayText;
 
-    // u•”‰®‚ğì‚évƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚ÉŒÄ‚Î‚ê‚é
+    /// <summary>
+    /// ã€Œéƒ¨å±‹ã‚’ä½œã‚‹ã€ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹
+    /// </summary>
     public void OnHostButton()
     {
-        // RelayManager‚ÌƒzƒXƒgì¬ˆ—‚ğŒÄ‚Ô
+        //RelayManagerã®ãƒ›ã‚¹ãƒˆä½œæˆå‡¦ç†ã‚’å‘¼ã¶
         RelayManager.Instance.CreateRelayHost();
     }
 
-    // u•”‰®‚É“ü‚évƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚ÉŒÄ‚Î‚ê‚é
+    /// <summary>
+    /// ã€Œéƒ¨å±‹ã«å…¥ã‚‹ã€ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹
+    /// </summary>
     public void OnJoinButton()
     {
-        // “ü—Í—“‚Ì•¶šiƒR[ƒhj‚ğ“Ç‚İæ‚é
-        string code = joinCodeInputField.text;
+        // å…¥åŠ›ã•ã‚ŒãŸæ–‡å­—ã‹ã‚‰è¦‹ãˆãªã„æ–‡å­—(ç©ºç™½)ã‚’æ¶ˆã™
+        string rawText = joinCodeInputField.text;
+        string cleanCode = rawText.Replace("\u200B", "").Trim().ToUpper();
 
-        // ‹ó‚Á‚Û‚¶‚á‚È‚¯‚ê‚ÎA‚»‚ÌƒR[ƒh‚ğg‚Á‚ÄQ‰Áˆ—‚ğŒÄ‚Ô
-        if (!string.IsNullOrEmpty(code))
+        // ç©ºã£ã½ã˜ã‚ƒãªã‘ã‚Œã°ã€ãã®ã‚³ãƒ¼ãƒ‰ã‚’ä½¿ã£ã¦å‚åŠ å‡¦ç†ã‚’å‘¼ã¶
+        if (!string.IsNullOrEmpty(cleanCode))
         {
-            RelayManager.Instance.JoinRelayClient(code);
+            RelayManager.Instance.JoinRelayClient(cleanCode);
         }
         else
         {
-            Debug.LogWarning("ƒR[ƒh‚ª“ü—Í‚³‚ê‚Ä‚¢‚Ü‚¹‚ñI");
+            Debug.LogWarning("ã‚³ãƒ¼ãƒ‰ãŒå…¥åŠ›ã•ã‚Œã¦ã„ã¾ã›ã‚“ï¼");
         }
     }
 }

@@ -33,7 +33,7 @@ public class LobbyUIManager : MonoBehaviour
             // もしこの枠の番号に、実際のプレイヤーが存在したら
             if (i < roomPlayers.Count)
             {
-                playerSlots[i].SetActive(true); // 枠を表示！
+                playerSlots[i].SetActive(true); // 枠を表示
 
                 var player = roomPlayers[i]; // そのプレイヤーの情報を取り出す
 
