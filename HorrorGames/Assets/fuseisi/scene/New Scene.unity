@@ -763,13 +763,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 682291301}
+  - component: {fileID: 682291302}
   m_Layer: 0
-  m_Name: 111
+  m_Name: EndingTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &682291301
 Transform:
   m_ObjectHideFlags: 0
@@ -785,6 +786,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &682291302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682291299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e78e19573d0d34448a71d9a40399250b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  repairImage: {fileID: 0}
+  repairGaugeImage: {fileID: 0}
+  repairRequiredTime: 10
+  repairAudioClip: {fileID: 0}
+  endingTimeline: {fileID: 886704478}
+  lobbySceneName: Lobby
 --- !u!1 &729168036
 GameObject:
   m_ObjectHideFlags: 0
@@ -2300,7 +2319,7 @@ Transform:
   m_Children:
   - {fileID: 1594278323}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0.000000001565923, y: 359.6144, z: -0.00000001736385}
 --- !u!114 &1881527285
 MonoBehaviour:
   m_ObjectHideFlags: 0
