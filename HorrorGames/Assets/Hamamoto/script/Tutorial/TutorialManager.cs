@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.UI;
 /// <summary>
 /// タイトル画面からソロ用の擬似オンラインチュートリアルを起動するクラス
 /// </summary>
@@ -10,6 +11,9 @@ public class TutorialManager : MonoBehaviour
     [Header("チュートリアル用のステージシーン")]
     [Scene]
     [SerializeField] private string tutorialScene;
+
+    [Header("ローディングのパネル")]
+    [SerializeField] private Image loadingImage;
 
     // 元のマルチプレイ用の設定を一時的に保存しておく変数
     private static string originalRoomScene;
@@ -38,6 +42,9 @@ public class TutorialManager : MonoBehaviour
             roomManager.onlineScene = originalOnlineScene;
             Debug.Log("ロビーの設定を通常のマルチプレイ用に復元しました。");
         }
+
+        //ローディングのパネルを非表示
+        loadingImage.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -45,6 +52,9 @@ public class TutorialManager : MonoBehaviour
     /// </summary>
     public void StartTutorial()
     {
+        //画面をローディング表示
+        loadingImage.gameObject.SetActive(true);
+
         var roomManager = NetworkManager.singleton as NetworkRoomManager;
         if (roomManager == null) return;
 

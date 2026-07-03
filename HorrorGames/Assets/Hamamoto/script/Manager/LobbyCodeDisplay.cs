@@ -8,7 +8,7 @@ public class LobbyCodeDisplay : MonoBehaviour
 
     private void Update()
     {
-        // 変更：static変数になったので、直接アクセスするだけ！
+        //直接アクセス
         if (!string.IsNullOrEmpty(RelayManager.currentJoinCode))
         {
             lobbyCodeText.text = "Code: " + RelayManager.currentJoinCode;

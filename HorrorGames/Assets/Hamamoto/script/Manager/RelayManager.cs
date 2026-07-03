@@ -9,6 +9,7 @@ using Unity.Services.Relay.Models;
 using UnityEngine;
 using Unity.Networking.Transport.Relay;
 using Utp;
+using UnityEngine.UI;
 /// <summary>
 /// Unity Relayを使って部屋の作成と参加を行うマネージャー
 /// </summary>
@@ -18,6 +19,9 @@ public class RelayManager : MonoBehaviour
 
     [Header("最大接続人数")]
     public int maxConnections = 4;
+
+    [Header("ローディングのパネル"), SerializeField]
+    private Image loadingImage;
 
     // UIで画面に表示するためにコードを保存しておく変数
     [HideInInspector]
@@ -39,6 +43,8 @@ public class RelayManager : MonoBehaviour
     {
         // ゲーム開始時にUnity Servicesを初期化し、匿名でログインする
         await InitializeAndSignIn();
+
+        loadingImage.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -57,7 +63,7 @@ public class RelayManager : MonoBehaviour
                 Debug.Log("$\"【Relay】匿名ログイン成功。 プレイヤーID: {AuthenticationService.Instance.PlayerId}\"");
             }
         }
-        catch(System.Exception e)
+        catch(System.Exception )
         {
             Debug.LogError("$\"【Relayエラー】ログイン失敗: {e.Message}\"");
         }
@@ -69,6 +75,9 @@ public class RelayManager : MonoBehaviour
     /// <returns></returns>
     public void CreateRelayHost()
     {
+        //画面をローディング表示
+        loadingImage.gameObject.SetActive(true);
+
         UtpTransport transport = NetworkManager.singleton.GetComponent<UtpTransport>();
         transport.useRelay = true;//Relayを使うモードにする
 
@@ -101,10 +110,13 @@ public class RelayManager : MonoBehaviour
 
         Debug.Log($"【Relay】コード {joinCode} で部屋に参加中...");
 
-        // UtpTransportに内蔵されている自動参加機能を使う！
+        // UtpTransportに内蔵されている自動参加機能を使う
         transport.ConfigureClientWithJoinCode(joinCode,
             () =>
             {
+                //画面をローディング表示
+                loadingImage.gameObject.SetActive(true);
+
                 // 成功した時の処理
                 Debug.Log("【Relay】接続準備完了.ゲームに参加します。");
                 NetworkManager.singleton.StartClient(); // クライアントとして起動

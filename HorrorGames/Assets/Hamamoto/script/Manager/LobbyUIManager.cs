@@ -4,81 +4,98 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 /// <summary>
-/// ƒƒr[‚Ìˆ—
+/// ãƒ­ãƒ“ãƒ¼ã®å‡¦ç†
 /// </summary>
 public class LobbyUIManager : MonoBehaviour
 {
-    [Header("4l•ª‚ÌƒXƒƒbƒg–{‘ÌiPlayerSlotj")]
+    [Header("4äººåˆ†ã®ã‚¹ãƒ­ãƒƒãƒˆæœ¬ä½“ï¼ˆPlayerSlotï¼‰")]
     [SerializeField] private GameObject[] playerSlots;
 
-    [Header("‚»‚ê‚¼‚ê‚Ì–¼‘OƒeƒLƒXƒg")]
+    [Header("ãã‚Œãã‚Œã®åå‰ãƒ†ã‚­ã‚¹ãƒˆ")]
     [SerializeField] private Text[] nameTexts;
 
-    [Header("‚»‚ê‚¼‚ê‚Ìƒ{ƒ^ƒ“‚ÌƒeƒLƒXƒgió‘Ôj")]
+    [Header("ãã‚Œãã‚Œã®ãƒœã‚¿ãƒ³ã®ãƒ†ã‚­ã‚¹ãƒˆï¼ˆçŠ¶æ…‹ï¼‰")]
     [SerializeField] private Text[] buttonTexts;
+
+    // ãƒ­ãƒ¼ãƒ‰ç”»é¢ãŒé–‹å§‹ã•ã‚ŒãŸã‹ã‚’åˆ¤å®šã™ã‚‹ãƒ•ãƒ©ã‚°
+    private bool isLoadingStarted = false;
 
     private void Update()
     {
-        //’ÊM‚ÌŠÇ—Ò‚ğæ“¾
+        //é€šä¿¡ã®ç®¡ç†è€…ã‚’å–å¾—
         var roomManager = NetworkManager.singleton as NetworkRoomManager;
         if (roomManager == null) return;
 
-        //Œ»İ•”‰®‚É“ü‚Á‚Ä‚éƒvƒŒƒCƒ„[‚ğæ“¾
+        //ç¾åœ¨éƒ¨å±‹ã«å…¥ã£ã¦ã‚‹ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’å–å¾—
         var roomPlayers = new List<NetworkRoomPlayer>(roomManager.roomSlots);
+        
+        // å…¨å“¡ãŒæº–å‚™å®Œäº†ã—ãŸã‹ã‚’åˆ¤å®šã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°
+        bool allReady = true;
 
-        // 4‚Â‚Ì˜g‚ğ‡”Ô‚Éƒ`ƒFƒbƒN‚µ‚Ä‚¢‚­
+        // èª°ã‚‚ã„ãªã„å ´åˆã¯ã¾ã æº–å‚™å®Œäº†ã§ã¯ãªã„
+        if (roomPlayers.Count == 0)
+        {
+            allReady = false;
+        }
+
+        // 4ã¤ã®æ ã‚’é †ç•ªã«ãƒã‚§ãƒƒã‚¯ã—ã¦ã„ã
         for (int i = 0; i < playerSlots.Length; i++)
         {
-            // ‚à‚µ‚±‚Ì˜g‚Ì”Ô†‚ÉAÀÛ‚ÌƒvƒŒƒCƒ„[‚ª‘¶İ‚µ‚½‚ç
+            // ã‚‚ã—ã“ã®æ ã®ç•ªå·ã«ã€å®Ÿéš›ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå­˜åœ¨ã—ãŸã‚‰
             if (i < roomPlayers.Count)
             {
-                playerSlots[i].SetActive(true); // ˜g‚ğ•\¦
+                playerSlots[i].SetActive(true); // æ ã‚’è¡¨ç¤º
 
-                var player = roomPlayers[i]; // ‚»‚ÌƒvƒŒƒCƒ„[‚Ìî•ñ‚ğæ‚èo‚·
+                var player = roomPlayers[i]; // ãã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æƒ…å ±ã‚’å–ã‚Šå‡ºã™
 
-                // –¼‘O‚ğ•ÏX
-                nameTexts[i].text = (i == 0) ? "ƒzƒXƒg (Player 1)" : $"ƒQƒXƒg (Player {i + 1})";
+                // åå‰ã‚’å¤‰æ›´
+                nameTexts[i].text = (i == 0) ? "ãƒ›ã‚¹ãƒˆ (Player 1)" : $"ã‚²ã‚¹ãƒˆ (Player {i + 1})";
 
-                // ‚»‚Ìl‚ªu€”õŠ®—¹v‚ğ‰Ÿ‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚Å•¶š‚ğ•Ï‚¦‚é
+                // ãã®äººãŒã€Œæº–å‚™å®Œäº†ã€ã‚’æŠ¼ã—ã¦ã„ã‚‹ã‹ã©ã†ã‹ã§æ–‡å­—ã‚’å¤‰ãˆã‚‹
                 if (player.readyToBegin)
                 {
                     buttonTexts[i].text = "READY!";
-                    buttonTexts[i].color = Color.red; // ƒzƒ‰[‚Á‚Û‚­ÔF‚É
+                    buttonTexts[i].color = Color.red; // ãƒ›ãƒ©ãƒ¼ã£ã½ãèµ¤è‰²ã«
                 }
                 else
                 {
-                    buttonTexts[i].text = "€”õ’†...";
+                    buttonTexts[i].text = "æº–å‚™ä¸­...";
                     buttonTexts[i].color = Color.white;
+                    allReady = false; // æº–å‚™ä¸­ãŒã„ã‚‹å ´åˆã¯å…¨å“¡å®Œäº†ã§ã¯ãªã„
                 }
             }
-            // ƒvƒŒƒCƒ„[‚ª‘¶İ‚µ‚È‚¢‹ó‚«˜g‚¾‚Á‚½‚ç
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå­˜åœ¨ã—ãªã„ç©ºãæ ã ã£ãŸã‚‰
             else
             {
-                playerSlots[i].SetActive(false); // ˜g‚ğ”ñ•\¦‚É‚·‚é
+                playerSlots[i].SetActive(false); // æ ã‚’éè¡¨ç¤ºã«ã™ã‚‹
             }
         }
     }
 
     /// <summary>
-    /// UI‚Ìu€”õŠ®—¹vƒ{ƒ^ƒ“‚ğ‰Ÿ‚µ‚½Û‚ÉŒÄ‚Î‚ê‚éˆ—
+    /// UIã®ã€Œæº–å‚™å®Œäº†ã€ãƒœã‚¿ãƒ³ã‚’æŠ¼ã—ãŸéš›ã«å‘¼ã°ã‚Œã‚‹å‡¦ç†
     /// </summary>
     public void ClickReadyButton()
     {
-        // ƒlƒbƒgƒ[ƒNã‚É‚ ‚éu©•ª©g‚ÌƒvƒŒƒCƒ„[v‚ğ’T‚·
+        // ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ä¸Šã«ã‚ã‚‹ã€Œè‡ªåˆ†è‡ªèº«ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã€ã‚’æ¢ã™
         var localPlayer = NetworkClient.localPlayer;
         if (localPlayer == null) return;
 
-        // ©•ª©g‚ÌRoomPlayerƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
+        // è‡ªåˆ†è‡ªèº«ã®RoomPlayerã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
         var roomPlayer = localPlayer.GetComponent<NetworkRoomPlayer>();
         if (roomPlayer == null) return;
 
-        // ¡‚Ì©•ª‚Ìó‘Ô‚Ìu‹tv‚É‚·‚éi€”õ’†‚È‚çŠ®—¹‚ÖAŠ®—¹‚È‚ç€”õ’†‚ÖƒLƒƒƒ“ƒZƒ‹j
+        // ä»Šã®è‡ªåˆ†ã®çŠ¶æ…‹ã®ã€Œé€†ã€ã«ã™ã‚‹ï¼ˆæº–å‚™ä¸­ãªã‚‰å®Œäº†ã¸ã€å®Œäº†ãªã‚‰æº–å‚™ä¸­ã¸ã‚­ãƒ£ãƒ³ã‚»ãƒ«ï¼‰
         bool changeState = !roomPlayer.readyToBegin;
 
-        // ƒT[ƒo[‚ÉŒü‚¯‚Ä’ÊM‚ğ‘—‚é
+        // ã‚µãƒ¼ãƒãƒ¼ã«å‘ã‘ã¦é€šä¿¡ã‚’é€ã‚‹
         roomPlayer.CmdChangeReadyState(changeState);
 
-        Debug.Log($"©•ª‚Ì€”õó‘Ô‚ğ {changeState} ‚É•ÏX‚µ‚Ü‚µ‚½I");
+        Debug.Log($"è‡ªåˆ†ã®æº–å‚™çŠ¶æ…‹ã‚’ {changeState} ã«å¤‰æ›´ã—ã¾ã—ãŸï¼");
     }
+
+
 }
