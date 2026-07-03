@@ -61,12 +61,29 @@ public class EnemyAttack : NetworkBehaviour
         {
             isAttacking = true;
             
-            // 捕まえた相手のNetworkIdentityを取得
-            NetworkIdentity netId = other.GetComponent<NetworkIdentity>();
+            // 捕まえた相手のNetworkIdentityをルートから取得
+            NetworkIdentity netId = other.GetComponentInParent<NetworkIdentity>();
             if (netId != null)
             {
+                Debug.Log("【EnemyAttack】NetworkIdentityを取得しました！ netId: " + netId.netId);
                 // 回線落ちを防ぐため、数値を送信する
                 RpcTriggerJumpscare(netId.netId);
+
+                // プレイヤールートからPlayerRagdollをくまなく探す（子オブジェクトについている場合もあるため）
+                PlayerRagdoll ragdoll = netId.GetComponentInChildren<PlayerRagdoll>();
+                if (ragdoll != null)
+                {
+                    Debug.Log("【EnemyAttack】PlayerRagdollを見つけました！RpcDieを実行します。");
+                    ragdoll.RpcDie();
+                }
+                else
+                {
+                    Debug.LogError("【重大なエラー】PlayerRagdollが見つかりません！プレイヤーのプレハブにPlayerRagdollスクリプトがアタッチされているか確認してください！");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("【EnemyAttack】NetworkIdentityが見つかりません！");
             }
 
             // サーバー側でシーン遷移のカウントダウンを開始
@@ -143,12 +160,7 @@ public class EnemyAttack : NetworkBehaviour
             gameOverPanal.gameObject.SetActive(true);
         }
 
-        // プレイヤーの見た目だけを非表示にする（回線落ちを防ぐためSetActive(false)は使わない）
-        Renderer[] renderers = player.GetComponentsInChildren<Renderer>();
-        foreach (Renderer r in renderers)
-        {
-            r.enabled = false;
-        }
+        // --- 修正：ここでRendererを無効化していたため、シーンから体が消えていました。この処理を削除しました。 ---
 
         Debug.Log("【演出】アニメーションとSEを再生します！");
         
