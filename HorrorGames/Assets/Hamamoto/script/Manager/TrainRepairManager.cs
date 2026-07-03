@@ -1,58 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Playables;
-using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
+using Mirror;
 /// <summary>
 /// 条件を満たしたときの列車の処理
 /// </summary>
-public class TrainRepairManager : MonoBehaviour
+public class TrainRepairManager : NetworkBehaviour
 {
     [Header("修理中のImage")]
     [SerializeField] private Image repairImage;
-
     [Header("チャージ用のImage")]
     [SerializeField] private Image repairGaugeImage;
 
     [Header("何秒間修理するか")]
-    [SerializeField] private float repairRequiredTime = 10f;
+    [SerializeField] private readonly float repairRequiredTime = 10f;
 
-    [Header("修理中のSE")]
-    [SerializeField] private AudioClip repairAudioClip;
+    [Header("修理中のSE"), SerializeField]
+    private AudioClip repairAudioClip;
 
-    [Header("エンディングTimeline")]
-    [SerializeField] private PlayableDirector endingTimeline;
+    [Header("エンディングムービー"), SerializeField]
+    private PlayableDirector endingDirector;
 
-    [Header("ロビーシーン名")]
-    [SerializeField] private string lobbySceneName = "Lobby";
-
-    // AudioSourceを格納
     private AudioSource audioSource;
 
-    // 修理時間を計測するタイマー
     private float repairTimer = 0f;
-
     // 素材が揃って、列車の前にいるか
     private bool canRepair = false;
-
+    //全員の画面で自動で共有されるフラグ（修理中か）
+    [SyncVar]
+    private bool isSomeoneRepairing = false;
+    //自分自身が修理の権利を取ったかどうかのフラグ
+    private bool amIRepairing = false;
     // Start is called before the first frame update
     void Start()
     {
-        // AudioSourceを取得
+        //格納
         audioSource = GetComponent<AudioSource>();
 
-        // 修理SEを設定
+        //ループに設定
         audioSource.clip = repairAudioClip;
-
-        // SEをループ再生に設定
         audioSource.loop = true;
 
-        // ゲージを最初は0にする
+        //ゲージを最初は０に
         repairGaugeImage.fillAmount = 0f;
-
-        // 修理UIを非表示
+        //非表示
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
     }
@@ -60,73 +53,85 @@ public class TrainRepairManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 修理可能な場合のみ実行
         if (canRepair)
         {
-            // Eキーを押している間
+            // Eキーを「押している間」ずっと実行
             if (Input.GetKey(KeyCode.E))
             {
-                // 修理UIを表示
+                //ほかの人がここで修理中なら自分はなにもできない
+                if (isSomeoneRepairing && !amIRepairing)
+                {
+                    return;
+                }
+
+                //
+                if (!amIRepairing)
+                {
+                    amIRepairing = true;
+                    CmdSetRepairState(true);
+                }
+                // ゲージを表示して時間を進める
                 repairGaugeImage.gameObject.SetActive(true);
                 repairImage.gameObject.SetActive(true);
-
-                // 修理時間を加算
                 repairTimer += Time.deltaTime;
 
-                // SEが鳴っていなければ再生
+                //音が鳴っていなければ再生を開始する
                 if (!audioSource.isPlaying)
                 {
                     audioSource.Play();
                 }
-
-                // 修理ゲージを更新
+                // ゲージのUIを満たす
                 repairGaugeImage.fillAmount = repairTimer / repairRequiredTime;
 
-                // 規定時間修理したら修理完了
+                // 5秒達成したかチェック
                 if (repairTimer >= repairRequiredTime)
                 {
                     RepairComplete();
                 }
             }
-            // Eキーを離したらリセット
+            // Eキーを「離した」らリセット
             else if (Input.GetKeyUp(KeyCode.E))
             {
-                ResetGauge();
+                StopMyRepair();
             }
         }
     }
 
     /// <summary>
-    /// UIManagerから修理可能状態を設定
+    /// 
+    /// </summary>
+    private void StopMyRepair()
+    {
+        if (amIRepairing)
+        {
+            amIRepairing = false;
+            CmdSetRepairState(false); // サーバーに「修理やめたからロック解除して！」と報告
+        }
+        ResetGauge(); // ゲージや音をゼロに戻す処理（元のまま）
+    }
+
+    /// <summary>
+    /// UIManagerから「修理可能状態」をオンオフしてもらう
     /// </summary>
     public void SetCanRepair(bool state)
     {
-        // 修理可能状態を変更
         canRepair = state;
-
-        // 修理可能でなくなったらゲージをリセット
-        if (!state)
-        {
-            ResetGauge();
-        }
+        // 視線が外れたらリセット
+        if (!state) ResetGauge();
     }
 
     /// <summary>
-    /// 修理ゲージをリセットする処理
+    /// リセットした際の処理
     /// </summary>
     private void ResetGauge()
     {
-        // タイマーをリセット
+        //リセット
         repairTimer = 0f;
-
-        // ゲージを0に戻す
         repairGaugeImage.fillAmount = 0f;
-
-        // 修理UIを非表示
+        //非表示
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
 
-        // 修理SEを停止
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
@@ -134,49 +139,85 @@ public class TrainRepairManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 修理完了時の処理
+    /// 修理できた際の処理
     /// </summary>
     private void RepairComplete()
     {
-        // 修理を終了
         canRepair = false;
-
-        // ゲージをMAXにする
+        // メーターをMAXで止める
         repairGaugeImage.fillAmount = 1f;
-
-        // 修理UIを非表示
+        //非表示
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
 
-        // 修理SEを停止
         if (audioSource != null && audioSource.isPlaying)
         {
             audioSource.Stop();
         }
 
-        // コンソールに表示
-        Debug.Log("修理完了！脱出成功！");
+        Debug.Log("修理完了！サーバに報告");
 
-        // エンディングTimelineが設定されている場合
-        if (endingTimeline != null)
-        {
-            // エンディングムービーを再生
-            endingTimeline.Play();
+        CmdTriggerEnding();
 
-            // Timeline終了後にロビーへ戻る
-            StartCoroutine(ReturnToLobbyAfterTimeline());
-        }
     }
 
     /// <summary>
-    /// Timeline終了後にロビーへ戻る
+    /// characterを非表示にする処理
     /// </summary>
-    private IEnumerator ReturnToLobbyAfterTimeline()
+    private void DestroyCharacter()
     {
-        // Timelineの再生時間だけ待機
-        yield return new WaitForSeconds((float)endingTimeline.duration);
+        //カメラはプレイヤーから外す
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            mainCam.transform.SetParent(null); // 親子関係を解除して外に出す
+        }
 
-        // ロビーシーンへ移動
-        SceneManager.LoadScene(lobbySceneName);
+        //Tagで対象のcharacterを非表示
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            player.SetActive(false);
+        }
+
+        GameObject[] enemis = GameObject.FindGameObjectsWithTag("Enamy");
+        foreach (GameObject enemy in enemis)
+        {
+            enemy.SetActive(false);
+        }
     }
+
+    [Command(requiresAuthority = false)]
+    private void CmdSetRepairState(bool state)
+    {
+        isSomeoneRepairing = state;
+    }
+
+    /// <summary>
+    /// クライアント側から修理を終わったことをサーバに伝える
+    /// </summary>
+    [Command(requiresAuthority = false)]
+    private void CmdTriggerEnding()
+    {
+        // サーバーが受け取ったら、全員にムービを出す
+        RpcPlayEndingMovie();
+    }
+
+    /// <summary>
+    /// サーバーが全員にムービーを流す命令
+    /// </summary>
+    [ClientRpc]
+    private void RpcPlayEndingMovie()
+    {
+        //characterを非表示
+        DestroyCharacter();
+
+        //ムービを再生
+        if (endingDirector != null)
+        {
+            endingDirector.Play();
+        }
+    }
+
+
 }
