@@ -5,47 +5,48 @@ using UnityEngine.Playables;
 using UnityEngine.UI;
 using Mirror;
 /// <summary>
-/// ğŒ‚ğ–‚½‚µ‚½‚Æ‚«‚Ì—ñÔ‚Ìˆ—
+/// æ¡ä»¶ã‚’æº€ãŸã—ãŸã¨ãã®åˆ—è»Šã®å‡¦ç†
 /// </summary>
+[RequireComponent(typeof(NetworkIdentity))]
 public class TrainRepairManager : NetworkBehaviour
 {
-    [Header("C—’†‚ÌImage")]
+    [Header("ä¿®ç†ä¸­ã®Image")]
     [SerializeField] private Image repairImage;
-    [Header("ƒ`ƒƒ[ƒW—p‚ÌImage")]
+    [Header("ãƒãƒ£ãƒ¼ã‚¸ç”¨ã®Image")]
     [SerializeField] private Image repairGaugeImage;
 
-    [Header("‰½•bŠÔC—‚·‚é‚©")]
+    [Header("ä½•ç§’é–“ä¿®ç†ã™ã‚‹ã‹")]
     [SerializeField] private readonly float repairRequiredTime = 10f;
 
-    [Header("C—’†‚ÌSE"), SerializeField]
+    [Header("ä¿®ç†ä¸­ã®SE"), SerializeField]
     private AudioClip repairAudioClip;
 
-    [Header("ƒGƒ“ƒfƒBƒ“ƒOƒ€[ƒr["), SerializeField]
+    [Header("ã‚¨ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒ ãƒ¼ãƒ“ãƒ¼"), SerializeField]
     private PlayableDirector endingDirector;
 
     private AudioSource audioSource;
 
     private float repairTimer = 0f;
-    // ‘fŞ‚ª‘µ‚Á‚ÄA—ñÔ‚Ì‘O‚É‚¢‚é‚©
+    // ç´ æãŒæƒã£ã¦ã€åˆ—è»Šã®å‰ã«ã„ã‚‹ã‹
     private bool canRepair = false;
-    //‘Sˆõ‚Ì‰æ–Ê‚Å©“®‚Å‹¤—L‚³‚ê‚éƒtƒ‰ƒOiC—’†‚©j
+    //å…¨å“¡ã®ç”»é¢ã§è‡ªå‹•ã§å…±æœ‰ã•ã‚Œã‚‹ãƒ•ãƒ©ã‚°ï¼ˆä¿®ç†ä¸­ã‹ï¼‰
     [SyncVar]
     private bool isSomeoneRepairing = false;
-    //©•ª©g‚ªC—‚ÌŒ —˜‚ğæ‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+    //è‡ªåˆ†è‡ªèº«ãŒä¿®ç†ã®æ¨©åˆ©ã‚’å–ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
     private bool amIRepairing = false;
     // Start is called before the first frame update
     void Start()
     {
-        //Ši”[
+        //æ ¼ç´
         audioSource = GetComponent<AudioSource>();
 
-        //ƒ‹[ƒv‚Éİ’è
+        //ãƒ«ãƒ¼ãƒ—ã«è¨­å®š
         audioSource.clip = repairAudioClip;
         audioSource.loop = true;
 
-        //ƒQ[ƒW‚ğÅ‰‚Í‚O‚É
+        //ã‚²ãƒ¼ã‚¸ã‚’æœ€åˆã¯ï¼ã«
         repairGaugeImage.fillAmount = 0f;
-        //”ñ•\¦
+        //éè¡¨ç¤º
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
     }
@@ -55,10 +56,10 @@ public class TrainRepairManager : NetworkBehaviour
     {
         if (canRepair)
         {
-            // EƒL[‚ğu‰Ÿ‚µ‚Ä‚¢‚éŠÔv‚¸‚Á‚ÆÀs
+            // Eã‚­ãƒ¼ã‚’ã€ŒæŠ¼ã—ã¦ã„ã‚‹é–“ã€ãšã£ã¨å®Ÿè¡Œ
             if (Input.GetKey(KeyCode.E))
             {
-                //‚Ù‚©‚Ìl‚ª‚±‚±‚ÅC—’†‚È‚ç©•ª‚Í‚È‚É‚à‚Å‚«‚È‚¢
+                //ã»ã‹ã®äººãŒã“ã“ã§ä¿®ç†ä¸­ãªã‚‰è‡ªåˆ†ã¯ãªã«ã‚‚ã§ããªã„
                 if (isSomeoneRepairing && !amIRepairing)
                 {
                     return;
@@ -70,26 +71,26 @@ public class TrainRepairManager : NetworkBehaviour
                     amIRepairing = true;
                     CmdSetRepairState(true);
                 }
-                // ƒQ[ƒW‚ğ•\¦‚µ‚ÄŠÔ‚ği‚ß‚é
+                // ã‚²ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã—ã¦æ™‚é–“ã‚’é€²ã‚ã‚‹
                 repairGaugeImage.gameObject.SetActive(true);
                 repairImage.gameObject.SetActive(true);
                 repairTimer += Time.deltaTime;
 
-                //‰¹‚ª–Â‚Á‚Ä‚¢‚È‚¯‚ê‚ÎÄ¶‚ğŠJn‚·‚é
+                //éŸ³ãŒé³´ã£ã¦ã„ãªã‘ã‚Œã°å†ç”Ÿã‚’é–‹å§‹ã™ã‚‹
                 if (!audioSource.isPlaying)
                 {
                     audioSource.Play();
                 }
-                // ƒQ[ƒW‚ÌUI‚ğ–‚½‚·
+                // ã‚²ãƒ¼ã‚¸ã®UIã‚’æº€ãŸã™
                 repairGaugeImage.fillAmount = repairTimer / repairRequiredTime;
 
-                // 5•b’B¬‚µ‚½‚©ƒ`ƒFƒbƒN
+                // 5ç§’é”æˆã—ãŸã‹ãƒã‚§ãƒƒã‚¯
                 if (repairTimer >= repairRequiredTime)
                 {
                     RepairComplete();
                 }
             }
-            // EƒL[‚ğu—£‚µ‚½v‚çƒŠƒZƒbƒg
+            // Eã‚­ãƒ¼ã‚’ã€Œé›¢ã—ãŸã€ã‚‰ãƒªã‚»ãƒƒãƒˆ
             else if (Input.GetKeyUp(KeyCode.E))
             {
                 StopMyRepair();
@@ -105,30 +106,30 @@ public class TrainRepairManager : NetworkBehaviour
         if (amIRepairing)
         {
             amIRepairing = false;
-            CmdSetRepairState(false); // ƒT[ƒo[‚ÉuC—‚â‚ß‚½‚©‚çƒƒbƒN‰ğœ‚µ‚ÄIv‚Æ•ñ
+            CmdSetRepairState(false); // ã‚µãƒ¼ãƒãƒ¼ã«ã€Œä¿®ç†ã‚„ã‚ãŸã‹ã‚‰ãƒ­ãƒƒã‚¯è§£é™¤ã—ã¦ï¼ã€ã¨å ±å‘Š
         }
-        ResetGauge(); // ƒQ[ƒW‚â‰¹‚ğƒ[ƒ‚É–ß‚·ˆ—iŒ³‚Ì‚Ü‚Üj
+        ResetGauge(); // ã‚²ãƒ¼ã‚¸ã‚„éŸ³ã‚’ã‚¼ãƒ­ã«æˆ»ã™å‡¦ç†ï¼ˆå…ƒã®ã¾ã¾ï¼‰
     }
 
     /// <summary>
-    /// UIManager‚©‚çuC—‰Â”\ó‘Ôv‚ğƒIƒ“ƒIƒt‚µ‚Ä‚à‚ç‚¤
+    /// UIManagerã‹ã‚‰ã€Œä¿®ç†å¯èƒ½çŠ¶æ…‹ã€ã‚’ã‚ªãƒ³ã‚ªãƒ•ã—ã¦ã‚‚ã‚‰ã†
     /// </summary>
     public void SetCanRepair(bool state)
     {
         canRepair = state;
-        // ‹ü‚ªŠO‚ê‚½‚çƒŠƒZƒbƒg
+        // è¦–ç·šãŒå¤–ã‚ŒãŸã‚‰ãƒªã‚»ãƒƒãƒˆ
         if (!state) ResetGauge();
     }
 
     /// <summary>
-    /// ƒŠƒZƒbƒg‚µ‚½Û‚Ìˆ—
+    /// ãƒªã‚»ãƒƒãƒˆã—ãŸéš›ã®å‡¦ç†
     /// </summary>
     private void ResetGauge()
     {
-        //ƒŠƒZƒbƒg
+        //ãƒªã‚»ãƒƒãƒˆ
         repairTimer = 0f;
         repairGaugeImage.fillAmount = 0f;
-        //”ñ•\¦
+        //éè¡¨ç¤º
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
 
@@ -139,14 +140,14 @@ public class TrainRepairManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// C—‚Å‚«‚½Û‚Ìˆ—
+    /// ä¿®ç†ã§ããŸéš›ã®å‡¦ç†
     /// </summary>
     private void RepairComplete()
     {
         canRepair = false;
-        // ƒ[ƒ^[‚ğMAX‚Å~‚ß‚é
+        // ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’MAXã§æ­¢ã‚ã‚‹
         repairGaugeImage.fillAmount = 1f;
-        //”ñ•\¦
+        //éè¡¨ç¤º
         repairGaugeImage.gameObject.SetActive(false);
         repairImage.gameObject.SetActive(false);
 
@@ -155,25 +156,25 @@ public class TrainRepairManager : NetworkBehaviour
             audioSource.Stop();
         }
 
-        Debug.Log("C—Š®—¹IƒT[ƒo‚É•ñ");
+        Debug.Log("ä¿®ç†å®Œäº†ï¼ã‚µãƒ¼ãƒã«å ±å‘Š");
 
         CmdTriggerEnding();
 
     }
 
     /// <summary>
-    /// character‚ğ”ñ•\¦‚É‚·‚éˆ—
+    /// characterã‚’éè¡¨ç¤ºã«ã™ã‚‹å‡¦ç†
     /// </summary>
     private void DestroyCharacter()
     {
-        //ƒJƒƒ‰‚ÍƒvƒŒƒCƒ„[‚©‚çŠO‚·
+        //ã‚«ãƒ¡ãƒ©ã¯ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰å¤–ã™
         Camera mainCam = Camera.main;
         if (mainCam != null)
         {
-            mainCam.transform.SetParent(null); // eqŠÖŒW‚ğ‰ğœ‚µ‚ÄŠO‚Éo‚·
+            mainCam.transform.SetParent(null); // è¦ªå­é–¢ä¿‚ã‚’è§£é™¤ã—ã¦å¤–ã«å‡ºã™
         }
 
-        //Tag‚Å‘ÎÛ‚Ìcharacter‚ğ”ñ•\¦
+        //Tagã§å¯¾è±¡ã®characterã‚’éè¡¨ç¤º
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject player in players)
         {
@@ -194,25 +195,25 @@ public class TrainRepairManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‘¤‚©‚çC—‚ğI‚í‚Á‚½‚±‚Æ‚ğƒT[ƒo‚É“`‚¦‚é
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆå´ã‹ã‚‰ä¿®ç†ã‚’çµ‚ã‚ã£ãŸã“ã¨ã‚’ã‚µãƒ¼ãƒã«ä¼ãˆã‚‹
     /// </summary>
     [Command(requiresAuthority = false)]
     private void CmdTriggerEnding()
     {
-        // ƒT[ƒo[‚ªó‚¯æ‚Á‚½‚çA‘Sˆõ‚Éƒ€[ƒr‚ğo‚·
+        // ã‚µãƒ¼ãƒãƒ¼ãŒå—ã‘å–ã£ãŸã‚‰ã€å…¨å“¡ã«ãƒ ãƒ¼ãƒ“ã‚’å‡ºã™
         RpcPlayEndingMovie();
     }
 
     /// <summary>
-    /// ƒT[ƒo[‚ª‘Sˆõ‚Éƒ€[ƒr[‚ğ—¬‚·–½—ß
+    /// ã‚µãƒ¼ãƒãƒ¼ãŒå…¨å“¡ã«ãƒ ãƒ¼ãƒ“ãƒ¼ã‚’æµã™å‘½ä»¤
     /// </summary>
     [ClientRpc]
     private void RpcPlayEndingMovie()
     {
-        //character‚ğ”ñ•\¦
+        //characterã‚’éè¡¨ç¤º
         DestroyCharacter();
 
-        //ƒ€[ƒr‚ğÄ¶
+        //ãƒ ãƒ¼ãƒ“ã‚’å†ç”Ÿ
         if (endingDirector != null)
         {
             endingDirector.Play();
