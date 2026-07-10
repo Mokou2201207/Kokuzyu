@@ -10,6 +10,13 @@ public class RelayUIManager : MonoBehaviour
     public TMP_InputField joinCodeInputField;
     public TextMeshProUGUI codeDisplayText;
 
+    private void Start()
+    {
+        // タイトルに戻ってきた時にカーソルが消えたままにならないよう、表示＆ロック解除する
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     /// <summary>
     /// 「部屋を作る」ボタンが押された時に呼ばれる
     /// </summary>

@@ -5,25 +5,32 @@ using Mirror;
 using UnityEngine.UI;
 using TMPro;
 /// <summary>
-/// ƒ^ƒCƒgƒ‹‚Åƒƒr[‚É“ü‚éˆ—
+/// ã‚¿ã‚¤ãƒˆãƒ«ã§ãƒ­ãƒ“ãƒ¼ã«å…¥ã‚‹å‡¦ç†
 /// </summary>
 public class TitleMenuManager : MonoBehaviour
 {
-    [Header("IPƒAƒhƒŒƒX“ü—Í—“")]
+    [Header("IPã‚¢ãƒ‰ãƒ¬ã‚¹å…¥åŠ›æ¬„")]
     [SerializeField] private TMP_InputField ipInputField;
 
+    private void Start()
+    {
+        // ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã£ã¦ããŸæ™‚ã«ã‚«ãƒ¼ã‚½ãƒ«ãŒæ¶ˆãˆãŸã¾ã¾ã«ãªã‚‰ãªã„ã‚ˆã†ã€è¡¨ç¤ºï¼†ãƒ­ãƒƒã‚¯è§£é™¤ã™ã‚‹
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     /// <summary>
-    /// •”‰®‚ğì‚éƒ{ƒ^ƒ“
+    /// éƒ¨å±‹ã‚’ä½œã‚‹ãƒœã‚¿ãƒ³
     /// </summary>
     public void ClickCreateRoom()
     {
-        Debug.Log("ƒzƒXƒg‚Æ‚µ‚Ä•”‰®‚ğì‚è‚Ü‚·");
-        //ƒT[ƒo[‚ğì‚éˆ—
+        Debug.Log("ãƒ›ã‚¹ãƒˆã¨ã—ã¦éƒ¨å±‹ã‚’ä½œã‚Šã¾ã™");
+        //ã‚µãƒ¼ãƒãƒ¼ã‚’ä½œã‚‹å‡¦ç†
         NetworkManager.singleton.StartHost();
     }
 
     /// <summary>
-    /// •”‰®‚É“ü‚éƒ{ƒ^ƒ“
+    /// éƒ¨å±‹ã«å…¥ã‚‹ãƒœã‚¿ãƒ³
     /// </summary>
     public void ClickJoinRoom()
     {
@@ -34,9 +41,9 @@ public class TitleMenuManager : MonoBehaviour
             ipAddress = ipInputField.text;
         }
 
-        Debug.Log($"{ipAddress} ‚Ì•”‰®‚ÉQ‰Á‚µ‚Ü‚·I");
+        Debug.Log($"{ipAddress} ã®éƒ¨å±‹ã«å‚åŠ ã—ã¾ã™ï¼");
 
-        // Ú‘±æ‚ğİ’è‚µ‚ÄAƒNƒ‰ƒCƒAƒ“ƒg‚Æ‚µ‚ÄQ‰Á‚·‚é
+        // æ¥ç¶šå…ˆã‚’è¨­å®šã—ã¦ã€ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã¨ã—ã¦å‚åŠ ã™ã‚‹
         NetworkManager.singleton.networkAddress = ipAddress;
         NetworkManager.singleton.StartClient();
     }

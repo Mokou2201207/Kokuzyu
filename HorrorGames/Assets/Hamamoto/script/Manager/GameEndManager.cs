@@ -4,24 +4,32 @@ using Mirror;
 public class GameEndManager : NetworkBehaviour
 {
     /// <summary>
-    /// y‘Sˆõ‹¤’Êz’N‚©‚ç‚Å‚àŒÄ‚Ño‚¹‚éƒ^ƒCƒgƒ‹‹­§‘—ŠÒˆ—
+    /// ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ã®Activation Trackã§ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã£ãŸã‚‰è‡ªå‹•å®Ÿè¡Œ
+    /// </summary>
+    private void OnEnable()
+    {
+        TriggerReturnToTitle();
+    }
+
+    /// <summary>
+    /// èª°ã‹ã‚‰ã§ã‚‚å‘¼ã³å‡ºã›ã‚‹ã‚¿ã‚¤ãƒˆãƒ«å¼·åˆ¶é€é‚„å‡¦ç†
     /// </summary>
     public void TriggerReturnToTitle()
     {
         if (isServer)
         {
-            // ©•ª‚ªƒzƒXƒgiƒT[ƒo[j‚È‚çA’¼Ú‘Sˆõ‚ğŠª‚«‚ñ‚ÅI—¹‚·‚é
+            // è‡ªåˆ†ãŒãƒ›ã‚¹ãƒˆï¼ˆã‚µãƒ¼ãƒãƒ¼ï¼‰ãªã‚‰ã€ç›´æ¥å…¨å“¡ã‚’å·»ãè¾¼ã‚“ã§çµ‚äº†ã™ã‚‹
             RpcDisconnectAll();
         }
-        else
+        elseã€€if(isClient && NetworkClient.active)
         {
-            // ©•ª‚ªƒQƒXƒgiƒNƒ‰ƒCƒAƒ“ƒgj‚È‚çAƒT[ƒo[‚ÉI—¹‚Æ—Š‚Ş
+            // è‡ªåˆ†ãŒã‚²ã‚¹ãƒˆï¼ˆã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆï¼‰ãªã‚‰ã€ã‚µãƒ¼ãƒãƒ¼ã«çµ‚äº†ã¨é ¼ã‚€
             CmdRequestReturnToTitle();
         }
     }
 
     /// <summary>
-    /// ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çƒT[ƒo[‚ÖI—¹‚ğ—v¿‚·‚é
+    /// ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰ã‚µãƒ¼ãƒãƒ¼ã¸çµ‚äº†ã‚’è¦è«‹ã™ã‚‹
     /// </summary>
     [Command(requiresAuthority = false)]
     private void CmdRequestReturnToTitle()
@@ -30,19 +38,25 @@ public class GameEndManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// ƒT[ƒo[‚©‚ç‘Sˆõ‚ÌÚ‘±‚ğˆÀ‘S‚ÉØ’f‚·‚é
+    /// ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å…¨å“¡ã®æ¥ç¶šã‚’å®‰å…¨ã«åˆ‡æ–­ã™ã‚‹
     /// </summary>
-    [Server] // ƒT[ƒo[ã‚Å‚Ì‚İÀs‚³‚ê‚é‚±‚Æ‚ğ•ÛØ
+    [Server] // ã‚µãƒ¼ãƒãƒ¼ä¸Šã§ã®ã¿å®Ÿè¡Œã•ã‚Œã‚‹ã“ã¨ã‚’ä¿è¨¼
     private void RpcDisconnectAll()
     {
-        Debug.Log("‘Sˆõ‚ğƒ^ƒCƒgƒ‹‰æ–Ê‚Ö‹­§‘—ŠÒ‚µ‚Ü‚·B");
+        Debug.Log("å…¨å“¡ã‚’ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢ã¸å¼·åˆ¶é€é‚„ã—ã¾ã™ã€‚");
 
         if (NetworkManager.singleton != null)
         {
-            // ƒzƒXƒgiƒT[ƒo[j‚ğ’â~B
-            // ‚±‚ê‚ğŒÄ‚Ô‚¾‚¯‚ÅAƒQƒXƒg‘¤‚Í©“®“I‚ÉØ’f‚³‚êA
-            // NetworkManager‚É“o˜^‚³‚ê‚Ä‚¢‚éuOffline Scenev‚Ö‘Sˆõ‚ªˆêÄ‚É–ß‚è‚Ü‚·B
+            // ãƒ›ã‚¹ãƒˆï¼ˆã‚µãƒ¼ãƒãƒ¼ï¼‰ã‚’åœæ­¢ã€‚
+            // ã“ã‚Œã‚’å‘¼ã¶ã ã‘ã§ã€ã‚²ã‚¹ãƒˆå´ã¯è‡ªå‹•çš„ã«åˆ‡æ–­ã•ã‚Œã€
+            // NetworkManagerã«ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã€ŒOffline Sceneã€ã¸å…¨å“¡ãŒä¸€æ–‰ã«æˆ»ã‚Šã¾ã™ã€‚
             NetworkManager.singleton.StopHost();
+        }
+
+        //å¤ã„RelayManagerã‚’å‰Šé™¤
+        if (RelayManager.Instance!=null)
+        {
+            Destroy(RelayManager.Instance.gameObject);
         }
     }
 }

@@ -213,7 +213,7 @@ public class TrainRepairManager : NetworkBehaviour
         //characterを非表示
         DestroyCharacter();
 
-        //ムービを再生
+        //ムービーを再生
         if (endingDirector != null)
         {
             endingDirector.Play();
