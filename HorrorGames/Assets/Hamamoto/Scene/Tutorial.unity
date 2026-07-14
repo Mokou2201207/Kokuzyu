@@ -206,7 +206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tutorialSteps:
   - stepName: "WASD\u30AD\u30FC\u3067\u79FB\u52D5\u3002"
-    tutorialVideo: {fileID: 32900000, guid: 02b13d249838b80449453aecc5da6ca0, type: 3}
+    tutorialVideo: {fileID: 32900000, guid: a755642cdde46714fa1d3a264260006c, type: 3}
     wallObject: {fileID: 843896936}
   videoPlayer: {fileID: 100572836}
   tutorialStepText: {fileID: 0}
