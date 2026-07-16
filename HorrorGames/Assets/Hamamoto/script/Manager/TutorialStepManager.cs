@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -10,9 +11,10 @@ public class TutorialStepManager : MonoBehaviour
 {
     //チュートリアルの各ステップを構造体へまとめる
     [System.Serializable]
-    public struct TutorialStep 
+    public struct TutorialStep
     {
         [Header("ステップの説明名前")]
+        [TextArea(2, 5)]
         public string stepName;
 
         [Header("このステップで流す動画")]
@@ -25,16 +27,25 @@ public class TutorialStepManager : MonoBehaviour
     [Header("チュートリアルのステップ一覧"), SerializeField]
     private TutorialStep[] tutorialSteps;
 
-    [Header("コンポーネントの設定")]
     [Header("動画をアタッチ"), SerializeField]
     private VideoPlayer videoPlayer;
     [Header("説明文をアタッチ"), SerializeField]
     private Text tutorialStepText;
+    [Header("タスクスライダーをアタッチ"), SerializeField]
+    private Slider taskSlider;
+
+    [Header("移動のタスク時間"), SerializeField]
+    private float MoveTaskTime = 5f;
+    [Header("ジャンプのタスク回数"), SerializeField]
+    private float JumpTaskTime = 5f;
 
     //現在のステップ番号
     private int currentStepIndex = 0;
     //行動中のチュートリアル用のタイマー
-    [SerializeField]private float movementTimer = 0f;
+    private float movementTimer = 0f;
+    //移動のカウント
+    private int jumpCount = 0;
+    
 
     void Start()
     {
@@ -58,6 +69,12 @@ public class TutorialStepManager : MonoBehaviour
         {
             Debug.Log("チュートリアル完了です！");
             return;
+        }
+
+        //Textを更新していく
+        if (tutorialStepText!=null)
+        {
+            tutorialStepText.text = tutorialSteps[index].stepName;
         }
 
         //動画を切り替えて再生
@@ -85,15 +102,66 @@ public class TutorialStepManager : MonoBehaviour
                 if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
                 {
                     movementTimer += Time.deltaTime;
-                    if (movementTimer >= 10f)
+
+                    //ゲージを増やす
+                    if (taskSlider != null)
                     {
+                        taskSlider.value = movementTimer / MoveTaskTime;
+                    }
+
+                    if (movementTimer >= MoveTaskTime)
+                    {
+                        //クリアしたらスライダーをリセット
                         ClearCurrentStep();
+                        taskSlider.value = 0; 
+                        movementTimer = 0f;
                     }
                 }
                 break;
 
-            //ジャンプのチュートリアル
-            case 1: 
+            //走る移動のチュートリアル
+            case 1:
+                // プレイヤーが移動キー&シフトキーを押している間、タイマーを進める
+                if ((Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) && Input.GetKey(KeyCode.LeftShift))
+                {
+                    movementTimer += Time.deltaTime;
+
+                    //ゲージを増やす
+                    if (taskSlider != null)
+                    {
+                        taskSlider.value = movementTimer / MoveTaskTime;
+                    }
+
+                    if (movementTimer >= MoveTaskTime)
+                    {
+                        //クリアしたらスライダーをリセット
+                        ClearCurrentStep();
+                        taskSlider.value = 0;
+                        movementTimer = 0f;
+                    }
+                }
+                break;
+
+            case 2:
+                // プレイヤーがジャンプキーを押した際タイマーを進める
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                   jumpCount++;
+
+                    //ゲージを増やす
+                    if (taskSlider != null)
+                    {
+                        taskSlider.value = (float)jumpCount / JumpTaskTime;
+                    }
+
+                    if (jumpCount >= JumpTaskTime)
+                    {
+                        //クリアしたらスライダーをリセット
+                        ClearCurrentStep();
+                        taskSlider.value = 0;
+                        jumpCount = 0;
+                    }
+                }
                 break;
         }
     }
