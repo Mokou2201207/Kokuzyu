@@ -40,12 +40,14 @@ public class TutorialStepManager : MonoBehaviour
     private float JumpTaskTime = 5f;
 
     //現在のステップ番号
-    private int currentStepIndex = 0;
+    public int currentStepIndex = 0;
     //行動中のチュートリアル用のタイマー
     private float movementTimer = 0f;
     //移動のカウント
     private int jumpCount = 0;
-    
+    //インベントリのカウント
+    private int inventoryCount = 0;
+
 
     void Start()
     {
@@ -65,20 +67,20 @@ public class TutorialStepManager : MonoBehaviour
     private void SetUpStep(int index)
     {
         //チュートリアル終了の条件
-        if (index>=tutorialSteps.Length)
+        if (index >= tutorialSteps.Length)
         {
             Debug.Log("チュートリアル完了です！");
             return;
         }
 
         //Textを更新していく
-        if (tutorialStepText!=null)
+        if (tutorialStepText != null)
         {
             tutorialStepText.text = tutorialSteps[index].stepName;
         }
 
         //動画を切り替えて再生
-        if (videoPlayer != null && tutorialSteps[index].tutorialVideo!=null)
+        if (videoPlayer != null && tutorialSteps[index].tutorialVideo != null)
         {
             videoPlayer.clip = tutorialSteps[index].tutorialVideo;
             videoPlayer.Play();
@@ -113,7 +115,7 @@ public class TutorialStepManager : MonoBehaviour
                     {
                         //クリアしたらスライダーをリセット
                         ClearCurrentStep();
-                        taskSlider.value = 0; 
+                        taskSlider.value = 0;
                         movementTimer = 0f;
                     }
                 }
@@ -146,7 +148,7 @@ public class TutorialStepManager : MonoBehaviour
                 // プレイヤーがジャンプキーを押した際タイマーを進める
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                   jumpCount++;
+                    jumpCount++;
 
                     //ゲージを増やす
                     if (taskSlider != null)
@@ -163,8 +165,71 @@ public class TutorialStepManager : MonoBehaviour
                     }
                 }
                 break;
+
+            //アイテムを持つ、選択、使用チュートリアル
+            case 3:
+                //アイテムを持つ
+                if (inventoryCount == 0)
+                {
+                    if (InventoryManager.instance.inventorySlots.Count >= 1)
+                    {
+                        inventoryCount = 1;
+                        //ゲージを増やす
+                        if (taskSlider != null)
+                        {
+                            taskSlider.value = 1f / 3f;
+                        }
+                    }
+                }
+                //アイテム選択
+                else if (inventoryCount == 1)
+                {
+                    if (InventoryManager.instance.currentSelectedSlot != -1)
+                    {
+                        inventoryCount = 2;
+                        //ゲージを増やす
+                        if (taskSlider != null)
+                        {
+                            taskSlider.value = 2f / 3f;
+                        }
+                    }
+                }
+                //アイテム使用
+                else if (inventoryCount == 2)
+                {
+                    if (InventoryManager.instance.inventorySlots.Count == 0)
+                    {
+                        inventoryCount = 3;
+                        //ゲージを増やす
+                        if (taskSlider != null)
+                        {
+                            taskSlider.value = 3f / 3f;
+                        }
+
+                        // チュートリアル達成処理
+                        ClearCurrentStep();
+
+                        // 次のステップのためにリセット
+                        if (taskSlider != null) taskSlider.value = 0f;
+                        inventoryCount = 0;
+                    }
+                    else if (InventoryManager.instance.currentSelectedSlot == -1)
+                    {
+                        inventoryCount = 1;
+                        //ゲージを減らす
+                        if (taskSlider != null)
+                        {
+                            taskSlider.value = 1f / 3f;
+                        }
+                    }
+                }
+                break;
         }
     }
+
+
+
+
 
     /// <summary>
     /// タスク達成時の処理（壁を消して次へ）

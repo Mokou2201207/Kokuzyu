@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// UI更新などの処理
+/// (Mainシーン用)UI更新などの処理
 /// </summary>
 public class UIManager : MonoBehaviour
 {

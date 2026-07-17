@@ -13,7 +13,7 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager instance;
 
     // アイテムの種類とカウントで保存
-    private Dictionary<ItemType, int> itemCounts = new Dictionary<ItemType, int>();
+    public Dictionary<ItemType, int> itemCounts = new Dictionary<ItemType, int>();
     private Dictionary<ObjType, int> objCounts = new Dictionary<ObjType, int>();
 
     // アイテムを３つだけ保存できる枠
