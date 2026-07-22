@@ -994,7 +994,7 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  showRoomGUI: 1
+  showRoomGUI: 0
   minPlayers: 1
   roomPlayerPrefab: {fileID: 1897936231393325603, guid: b912ed834ae44da458530e41dec4d115, type: 3}
   RoomScene: Assets/Hamamoto/Scene/Lobby.unity

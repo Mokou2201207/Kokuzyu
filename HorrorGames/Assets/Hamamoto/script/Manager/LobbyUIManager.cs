@@ -20,8 +20,20 @@ public class LobbyUIManager : MonoBehaviour
     [Header("それぞれのボタンのテキスト（状態）")]
     [SerializeField] private Text[] buttonTexts;
 
+    [Header("ボタン設定")]
+    [SerializeField] private Button returnToTitleButton;
+
     // ロード画面が開始されたかを判定するフラグ
     private bool isLoadingStarted = false;
+
+    private void Start()
+    {
+        // タイトルに戻るボタンのOnClickイベント登録
+        if (returnToTitleButton != null)
+        {
+            returnToTitleButton.onClick.AddListener(OnReturnToTitleButtonClicked);
+        }
+    }
 
     private void Update()
     {
@@ -97,5 +109,44 @@ public class LobbyUIManager : MonoBehaviour
         Debug.Log($"自分の準備状態を {changeState} に変更しました！");
     }
 
+    /// <summary>
+    /// UIの「タイトルに戻る」ボタンを押した際に呼ばれる処理
+    /// ホストが押したら全員タイトルへ、ゲストが押したら自分だけタイトルへ戻る
+    /// </summary>
+    public void OnReturnToTitleButtonClicked()
+    {
+        // タイトル画面に戻るのでカーソルを表示・ロック解除
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
+        // ホスト（サーバー兼クライアント）の場合は StopHost() で全員タイトルへ
+        // クライアント（ゲスト）の場合は StopClient() で自分だけタイトルへ
+        if (NetworkServer.active && NetworkClient.active)
+        {
+            if (NetworkManager.singleton != null)
+            {
+                NetworkManager.singleton.StopHost();
+            }
+        }
+        else if (NetworkClient.isConnected || NetworkClient.active)
+        {
+            if (NetworkManager.singleton != null)
+            {
+                NetworkManager.singleton.StopClient();
+            }
+        }
+        else
+        {
+            if (NetworkManager.singleton != null)
+            {
+                NetworkManager.singleton.StopHost();
+            }
+        }
+
+        // 古いRelayManagerを削除
+        if (RelayManager.Instance != null)
+        {
+            Destroy(RelayManager.Instance.gameObject);
+        }
+    }
 }
