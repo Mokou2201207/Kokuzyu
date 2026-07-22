@@ -9,8 +9,8 @@ using Mirror;
 /// </summary>
 public class OptionManager : MonoBehaviour
 {
-    [Header("コンポーネントを自動アタッチ")]
-    [SerializeField] private AudioSource optionAudioSource;
+    [Header("コンポーネントを自動アタッチ"), SerializeField]
+    private AudioSource optionAudioSource;
 
     [Header("オプションのパネル"), SerializeField]
     private Image optionPanal;
@@ -18,24 +18,24 @@ public class OptionManager : MonoBehaviour
     [Header("オプションを開くSE"), SerializeField]
     private AudioClip optionAudioClip;
 
-    [Header("ボタン設定")]
-    [SerializeField]
+    [Header("タイトルに戻るボタン"), SerializeField]
     private Button returnToTitleButton;
-    [SerializeField]
+
+    [Header("オプションを閉じるボタン"), SerializeField]
     private Button closeOptionButton;
 
-    //オプションを開いているか
+    // オプションを開いているか
     public static bool isOpenOption = false;
 
     private void Start()
     {
-        //最初はオプションのパネルを非表示
+        // 最初はオプションのパネルを非表示
         if (optionPanal != null)
         {
             optionPanal.gameObject.SetActive(false);
         }
 
-        // ボタンのOnClickイベントをアタッチ（インスペクターでセットされている場合）
+        // ボタンのOnClickイベントをアタッチ
         if (returnToTitleButton != null)
         {
             returnToTitleButton.onClick.AddListener(OnReturnToTitleButtonClicked);
@@ -48,7 +48,7 @@ public class OptionManager : MonoBehaviour
 
     private void Update()
     {
-        // オンライン対応：複数プレイヤーがいる場合でも、自分（ローカルプレイヤー）のAudioSourceを取得する
+        // オンライン対応 ローカルプレイヤーのAudioSourceを取得する
         if (optionAudioSource == null)
         {
             if (NetworkClient.localPlayer != null)
@@ -57,7 +57,7 @@ public class OptionManager : MonoBehaviour
             }
         }
 
-        //オプションを開く/閉じる処理 (ESCキー)
+        // オプションを開く閉じる処理
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (!isOpenOption)
@@ -78,7 +78,7 @@ public class OptionManager : MonoBehaviour
     {
         isOpenOption = true;
 
-        // 再生前に一度Stopすることで、連打した際の音の重なりを防ぐ
+        // 再生前に一度Stopすることで音の重なりを防ぐ
         if (optionAudioSource != null)
         {
             optionAudioSource.Stop();
@@ -90,13 +90,13 @@ public class OptionManager : MonoBehaviour
             optionPanal.gameObject.SetActive(true);
         }
 
-        // オプション操作のためにマウスカーソルを表示・ロック解除
+        // オプション操作のためにマウスカーソルを表示
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     /// <summary>
-    /// オプション画面を閉じる（ESCキーまたは閉じるボタン）
+    /// オプション画面を閉じる
     /// </summary>
     public void CloseOption()
     {
@@ -117,7 +117,7 @@ public class OptionManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // (Unityエディタ上でESCキーを押すと強制的にロック解除される仕様を回避するため、数フレーム後にも再度ロックする)
+        // 数フレーム後にも再度ロックする
         StartCoroutine(LockCursorDelay());
     }
 
@@ -136,12 +136,12 @@ public class OptionManager : MonoBehaviour
     {
         isOpenOption = false;
 
-        // タイトル画面に戻るのでカーソルを表示・ロック解除
+        // タイトル画面に戻るのでカーソルを表示
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // ホスト（サーバー兼クライアント）の場合は StopHost() で全員タイトルへ
-        // クライアント（ゲスト）の場合は StopClient() で自分だけタイトルへ
+        // ホストの場合は StopHost で全員タイトルへ
+        // クライアントの場合は StopClient で自分だけタイトルへ
         if (NetworkServer.active && NetworkClient.active)
         {
             if (NetworkManager.singleton != null)
@@ -173,7 +173,7 @@ public class OptionManager : MonoBehaviour
 
     private IEnumerator LockCursorDelay()
     {
-        // 1フレーム後と0.1秒後に念押しでカーソルをロック・非表示にする（エディタのESCキー対策）
+        // 1フレーム後と0.1秒後に念押しでカーソルをロックする
         yield return null;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
