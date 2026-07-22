@@ -246,6 +246,18 @@ public class InventoryManager : MonoBehaviour
 
                 //興奮剤
             case ItemType.Stimulant:
+                if (UIManager.instance.sutaminaParameterManager != null)
+                {
+                    UIManager.instance.sutaminaParameterManager.UseStimulant();
+                }
+                break;
+
+            //栄養剤
+            case ItemType.SpeedEnergy:
+                if (UIManager.instance.sutaminaParameterManager != null)
+                {
+                    UIManager.instance.sutaminaParameterManager.UseSpeedEnergy();
+                }
                 break;
         }
     }

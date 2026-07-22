@@ -31,6 +31,9 @@ public class InteractableItem : MonoBehaviour
         MusicBox,
         //ãªï±ç‹
         Stimulant,
+        //âhó{ç‹
+        SpeedEnergy,
+
     }
 
     /// <summary>

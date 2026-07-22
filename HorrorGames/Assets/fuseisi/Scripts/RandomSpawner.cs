@@ -13,11 +13,15 @@ public class RandomSpawner : MonoBehaviour
     public GameObject driverPrefab;
     public GameObject keyPrefab;
     public GameObject musicBoxPrefab;
+    public GameObject stimulantPrefab; // 興奮剤
+    public GameObject speedEnergyPrefab; // 栄養剤
 
     [Header("生成数")]
     public int crossCount = 5;
     public int batteryCount = 5;
     public int musicBoxCount = 3;
+    public int stimulantCount = 2;
+    public int speedEnergyCount = 2;
 
     [Header("ランダムスポーン位置 (バッテリーと十字架用)")]
     public Transform[] randomSpawnPoints;
@@ -69,6 +73,18 @@ public class RandomSpawner : MonoBehaviour
             for (int i = 0; i < musicBoxCount; i++)
             {
                 SpawnRandomItem(musicBoxPrefab);
+            }
+
+            //stimulant
+            for (int i = 0; i < stimulantCount; i++)
+            {
+                SpawnRandomItem(stimulantPrefab);
+            }
+
+            //speedEnergy
+            for (int i = 0; i < speedEnergyCount; i++)
+            {
+                SpawnRandomItem(speedEnergyPrefab);
             }
         }
         else

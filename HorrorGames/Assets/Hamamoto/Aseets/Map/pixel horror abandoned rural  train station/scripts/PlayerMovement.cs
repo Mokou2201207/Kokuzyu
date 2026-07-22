@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
@@ -123,6 +123,12 @@ public class PlayerMovement : NetworkBehaviour
                 sutaminaParameterManagerScript.isRun = true;
                 //呪いによって速度変化
                 float runspeed = curseManager.isCurseFull ? curseRunSpeed : runSpeed;
+                
+                if (sutaminaParameterManagerScript.isSpeedBoosted)
+                {
+                    runspeed *= 2f; // 興奮剤によるスピード2倍
+                }
+                
                 speed = runspeed;
             }
             else

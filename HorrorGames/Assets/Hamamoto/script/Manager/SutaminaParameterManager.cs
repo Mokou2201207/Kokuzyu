@@ -44,6 +44,34 @@ public class SutaminaParameterManager : NetworkBehaviour
     //息切れして回復待ちかどうか
     public bool isExhausted = false;
 
+    [Header("アイテムによるバフ")]
+    public bool isSpeedBoosted = false;
+    public bool isStaminaInfinite = false;
+
+    public void UseStimulant()
+    {
+        StartCoroutine(StimulantCoroutine());
+    }
+
+    private IEnumerator StimulantCoroutine()
+    {
+        isSpeedBoosted = true;
+        yield return new WaitForSeconds(15f);
+        isSpeedBoosted = false;
+    }
+
+    public void UseSpeedEnergy()
+    {
+        StartCoroutine(SpeedEnergyCoroutine());
+    }
+
+    private IEnumerator SpeedEnergyCoroutine()
+    {
+        isStaminaInfinite = true;
+        yield return new WaitForSeconds(20f);
+        isStaminaInfinite = false;
+    }
+
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
@@ -72,10 +100,13 @@ public class SutaminaParameterManager : NetworkBehaviour
         //走っていて、息切れしていなかったら
         if (isRun && !isExhausted)
         {
-            //減るスピードをフラグによって決める
-            float currentDecrease = curseManager.isCurseFull ? curseDecreaseSpeed : decreaseSpeed;
-            //減らす処理（共通）
-            sutaminaSlider.value -= currentDecrease * Time.deltaTime;
+            if (!isStaminaInfinite)
+            {
+                //減るスピードをフラグによって決める
+                float currentDecrease = curseManager.isCurseFull ? curseDecreaseSpeed : decreaseSpeed;
+                //減らす処理（共通）
+                sutaminaSlider.value -= currentDecrease * Time.deltaTime;
+            }
             // 走っている間は回復タイマーをリセットし続ける
             recoveryTimer = 0f;
 
