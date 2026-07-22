@@ -92,7 +92,7 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         // ジャンプの入力判定 (Moveの前に持ってくることで、Moveによる接地判定のズレを防ぐ)
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && isGrounded && !OptionManager.isOpenOption)
         {
             V.y = Mathf.Sqrt(JumpHight * -2f * gravity);
 
@@ -103,8 +103,8 @@ public class PlayerMovement : NetworkBehaviour
             }
         }
 
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        float x = OptionManager.isOpenOption ? 0f : Input.GetAxis("Horizontal");
+        float z = OptionManager.isOpenOption ? 0f : Input.GetAxis("Vertical");
 
 
         Vector3 move = transform.right * x + transform.forward * z;

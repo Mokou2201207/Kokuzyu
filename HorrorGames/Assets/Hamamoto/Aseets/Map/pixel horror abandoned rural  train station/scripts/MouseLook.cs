@@ -23,23 +23,9 @@ namespace littleDog
         void Update()
         {
             if (!isLocalPlayer) return; // 自分が操作するキャラ以外は無視
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                CanMove = !CanMove;
-                if(CanMove == false)
-                {
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
-                    // Time.timeScale = 0;
-                }else
-                {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                    // Time.timeScale = 1;
-                }
-  
-            }
-            if (CanMove == false) return;
+            
+            if (OptionManager.isOpenOption) return; // オプションが開かれている間は視点移動無効
+
             float mousex = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
             float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
             Xrot -= mouseY;

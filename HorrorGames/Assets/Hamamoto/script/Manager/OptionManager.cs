@@ -2,53 +2,88 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
+
 /// <summary>
-/// option�ݒ菈��
+/// option設定処理
 /// </summary>
 public class OptionManager : MonoBehaviour
 {
-    [Header("�R���|�[�l���g�������A�^�b�`")]
+    [Header("コンポーネントを自動アタッチ")]
     [SerializeField]private AudioSource optionAudioSource;
 
-    [Header("�I�v�V�����̃p�l��"), SerializeField]
+    [Header("オプションのパネル"), SerializeField]
     private Image optionPanal;
 
-    [Header("�I�v�V�������J��SE"),SerializeField]
+    [Header("オプションを開くSE"),SerializeField]
     private AudioClip optionAudioClip;
 
-    //�I�v�V�������J���Ă��邩
-    private bool isOpenOption=false;
+    //オプションを開いているか
+    public static bool isOpenOption = false;
 
     private void Start()
     {
-        //�ŏ��̓I�v�V�����̃p�l�����\��
+        //最初はオプションのパネルを非表示
         optionPanal.gameObject.SetActive(false);
-
-        //Tag�Ō���
-        if (optionAudioSource==null)
-        {
-            GameObject AudioObj = GameObject.FindGameObjectWithTag("Player");
-            if (AudioObj!=null)
-            {
-                optionAudioSource = AudioObj.GetComponent<AudioSource>();
-            }
-        }
     }
 
     private void Update()
     {
-        //�I�v�V�������J������
-        if (Input.GetKeyDown(KeyCode.Escape)&&!isOpenOption)
+        // オンライン対応：複数プレイヤーがいる場合でも、自分（ローカルプレイヤー）のAudioSourceを取得する
+        if (optionAudioSource == null)
+        {
+            if (NetworkClient.localPlayer != null)
+            {
+                optionAudioSource = NetworkClient.localPlayer.GetComponent<AudioSource>();
+            }
+        }
+
+        //オプションを開く処理
+        if (Input.GetKeyDown(KeyCode.Escape) && !isOpenOption)
         {
             isOpenOption = true;
-            //�Đ�
-            optionAudioSource.PlayOneShot(optionAudioClip);
+            
+            // 再生前に一度Stopすることで、連打した際の音の重なりを防ぐ
+            if (optionAudioSource != null)
+            {
+                optionAudioSource.Stop(); 
+                optionAudioSource.PlayOneShot(optionAudioClip);
+            }
             optionPanal.gameObject.SetActive(true);
+
+            // オプション操作のためにマウスカーソルを表示・ロック解除
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
-        else if (Input.GetKeyDown(KeyCode.Escape)&&isOpenOption)
+        else if (Input.GetKeyDown(KeyCode.Escape) && isOpenOption)
         {
             isOpenOption = false;
             optionPanal.gameObject.SetActive(false);
+            
+            // オプションを閉じたら音を消す
+            if (optionAudioSource != null)
+            {
+                optionAudioSource.Stop();
+            }
+
+            // オプションを閉じたらマウスカーソルを隠して視点操作に戻す
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            // (Unityエディタ上でESCキーを押すと強制的にロック解除される仕様を回避するため、数フレーム後にも再度ロックする)
+            StartCoroutine(LockCursorDelay());
         }
+    }
+
+    private IEnumerator LockCursorDelay()
+    {
+        // 1フレーム後と0.1秒後に念押しでカーソルをロック・非表示にする（エディタのESCキー対策）
+        yield return null;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        yield return new WaitForSeconds(0.1f);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
