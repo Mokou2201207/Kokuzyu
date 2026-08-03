@@ -34,6 +34,15 @@ public class SutaminaParameterManager : NetworkBehaviour
     [Header("息切れSE")]
     [SerializeField] private AudioClip shortnessSE;
 
+    [Header("興奮剤使用中の効果音"), SerializeField]
+    private AudioClip stimulantSE;
+
+    [Header("栄養剤使用中の効果音"), SerializeField]
+    private AudioClip speedEnergySE;
+
+    private AudioSource stimulantAudioSource;
+    private AudioSource speedEnergyAudioSource;
+
     // 回復までのカウントダウン用タイマー
     private float recoveryTimer = 0f;
 
@@ -56,7 +65,27 @@ public class SutaminaParameterManager : NetworkBehaviour
     private IEnumerator StimulantCoroutine()
     {
         isSpeedBoosted = true;
+
+        // 興奮剤の効果音をループ再生する
+        if (stimulantSE != null)
+        {
+            if (stimulantAudioSource == null)
+            {
+                stimulantAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+            stimulantAudioSource.clip = stimulantSE;
+            stimulantAudioSource.loop = true;
+            stimulantAudioSource.Play();
+        }
+
         yield return new WaitForSeconds(15f);
+
+        // 興奮剤の効果音を停止する
+        if (stimulantAudioSource != null)
+        {
+            stimulantAudioSource.Stop();
+        }
+
         isSpeedBoosted = false;
     }
 
@@ -68,7 +97,27 @@ public class SutaminaParameterManager : NetworkBehaviour
     private IEnumerator SpeedEnergyCoroutine()
     {
         isStaminaInfinite = true;
+
+        // 栄養剤の効果音をループ再生する
+        if (speedEnergySE != null)
+        {
+            if (speedEnergyAudioSource == null)
+            {
+                speedEnergyAudioSource = gameObject.AddComponent<AudioSource>();
+            }
+            speedEnergyAudioSource.clip = speedEnergySE;
+            speedEnergyAudioSource.loop = true;
+            speedEnergyAudioSource.Play();
+        }
+
         yield return new WaitForSeconds(20f);
+
+        // 栄養剤の効果音を停止する
+        if (speedEnergyAudioSource != null)
+        {
+            speedEnergyAudioSource.Stop();
+        }
+
         isStaminaInfinite = false;
     }
 

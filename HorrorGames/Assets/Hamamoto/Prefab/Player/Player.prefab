@@ -394,9 +394,13 @@ MonoBehaviour:
   curseManager: {fileID: 0}
   audioSource: {fileID: 3464418188081688643}
   shortnessSE: {fileID: 8300000, guid: 15a3ad354e7840441978102979135037, type: 3}
+  stimulantSE: {fileID: 8300000, guid: 89c3aa892cd7545489170df66aa11f84, type: 3}
+  speedEnergySE: {fileID: 8300000, guid: 89c3aa892cd7545489170df66aa11f84, type: 3}
   isRun: 0
   isStaminaFull: 1
   isExhausted: 0
+  isSpeedBoosted: 0
+  isStaminaInfinite: 0
 --- !u!114 &5527486936770360404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2495,3 +2499,4 @@ MonoBehaviour:
   syncInterval: 0
   animator: {fileID: 2759223762430186845}
   ragdollRigidbodies: []
+  testRagdoll: 0
