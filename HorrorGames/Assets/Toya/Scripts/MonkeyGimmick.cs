@@ -1,7 +1,8 @@
 using UnityEngine;
+using Mirror;
 
 [RequireComponent(typeof(Collider))]
-public class MonkeyGimmick : MonoBehaviour
+public class MonkeyGimmick : NetworkBehaviour
 {
     [Header("参照")]
     [Tooltip("プレイヤーのカメラ。指定しない場合はメインカメラが自動設定されます")]
@@ -15,7 +16,7 @@ public class MonkeyGimmick : MonoBehaviour
 
     [Header("設定")]
     [Tooltip("カメラを基準とした召喚位置のズレ（X:左右, Y:上下, Z:前後）")]
-    public Vector3 spawnOffset = new Vector3(0, 0, 1.0f);
+    public Vector3 spawnOffset = new Vector3(0, 0, 1.5f);
     
     [Tooltip("召喚された猿が消えるまでの時間（秒）")]
     public float disappearTime = 0.5f;
@@ -32,17 +33,45 @@ public class MonkeyGimmick : MonoBehaviour
     // デバッグ用
     private GameObject debugMonkeyInstance;
 
-    void Start()
+    /// <summary>
+    /// カメラが未設定の場合にメインカメラから取得を試みる
+    /// </summary>
+    private bool TrySetupCamera()
     {
         if (playerCamera == null && Camera.main != null)
         {
             playerCamera = Camera.main.transform;
         }
 
-        if (playerCamera != null)
+        if (playerCamera != null && cam == null)
         {
             cam = playerCamera.GetComponent<Camera>();
         }
+
+        return playerCamera != null && cam != null;
+    }
+
+    /// <summary>
+    /// カメラのニアクリップ面とめり込まないように補正した召喚オフセットを取得する
+    /// </summary>
+    private Vector3 GetCorrectedSpawnOffset()
+    {
+        Vector3 corrected = spawnOffset;
+        if (cam != null)
+        {
+            // ニアクリップ面の手前0.3m以内にスポーンしないようにする
+            float minZ = cam.nearClipPlane + 0.3f;
+            if (corrected.z < minZ)
+            {
+                corrected.z = minZ;
+            }
+        }
+        return corrected;
+    }
+
+    void Start()
+    {
+        TrySetupCamera();
 
         // トリガーとして設定されているか確認
         Collider col = GetComponent<Collider>();
@@ -55,11 +84,21 @@ public class MonkeyGimmick : MonoBehaviour
 
     void Update()
     {
-        // このオブジェクト（ギミック本体）がプレイヤーと顔を合わせないよう、常に背を向ける
+        // クライアントでなければ処理を行わない
+        if (!isClient) return;
+
+        // カメラが未設定ならメインカメラから取得を試みる
+        if (playerCamera == null || cam == null)
+        {
+            TrySetupCamera();
+        }
+
+        // このオブジェクトがプレイヤーと顔を合わせないよう常に背を向ける
         if (playerCamera != null)
         {
             Vector3 awayDirection = transform.position - playerCamera.position;
-            awayDirection.y = 0; // 上下に傾いて不自然にならないよう、高さを無視する
+            // 上下に傾いて不自然にならないよう高さを無視する
+            awayDirection.y = 0;
             if (awayDirection.sqrMagnitude > 0.001f)
             {
                 transform.rotation = Quaternion.LookRotation(awayDirection);
@@ -75,7 +114,8 @@ public class MonkeyGimmick : MonoBehaviour
         // デバッグ用の猿が表示されている間は、インスペクターの値変更に合わせて位置をリアルタイム更新する
         if (debugMonkeyInstance != null && playerCamera != null)
         {
-            debugMonkeyInstance.transform.position = playerCamera.TransformPoint(spawnOffset);
+            Vector3 correctedOffset = GetCorrectedSpawnOffset();
+            debugMonkeyInstance.transform.position = playerCamera.TransformPoint(correctedOffset);
             debugMonkeyInstance.transform.rotation = Quaternion.LookRotation(-playerCamera.forward);
         }
 
@@ -123,23 +163,37 @@ public class MonkeyGimmick : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // プレイヤー（またはカメラ）が範囲内に入った
-        if (other.CompareTag("Player") || other.GetComponentInChildren<Camera>() != null || other.GetComponentInParent<Camera>() != null)
+        // ローカルプレイヤーが範囲内に入った場合のみ処理する
+        NetworkIdentity identity = other.GetComponent<NetworkIdentity>() ?? other.GetComponentInParent<NetworkIdentity>();
+        if (identity != null && identity.isLocalPlayer)
         {
             isPlayerInTrigger = true;
-            hasSeenMonkey = false; // 状態をリセット
-            Debug.Log($"MonkeyGimmick: プレイヤー判定（{other.name}）が範囲内に入りました。");
+            // 状態をリセット
+            hasSeenMonkey = false;
+            Debug.Log($"MonkeyGimmick: ローカルプレイヤー（{other.name}）が範囲内に入りました。");
+
+            // カメラが未設定ならトリガーに入ったオブジェクトからカメラの取得を試みる
+            if (playerCamera == null || cam == null)
+            {
+                Camera foundCam = other.GetComponentInChildren<Camera>() ?? other.GetComponentInParent<Camera>();
+                if (foundCam != null)
+                {
+                    playerCamera = foundCam.transform;
+                    cam = foundCam;
+                }
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // 範囲外に出た
-        if (other.CompareTag("Player") || other.GetComponentInChildren<Camera>() != null || other.GetComponentInParent<Camera>() != null)
+        // ローカルプレイヤーが範囲外に出た場合のみ処理する
+        NetworkIdentity identity = other.GetComponent<NetworkIdentity>() ?? other.GetComponentInParent<NetworkIdentity>();
+        if (identity != null && identity.isLocalPlayer)
         {
             isPlayerInTrigger = false;
             hasSeenMonkey = false;
-            Debug.Log("MonkeyGimmick: プレイヤーが範囲外に出ました。ギミックをリセットします。");
+            Debug.Log("MonkeyGimmick: ローカルプレイヤーが範囲外に出ました。ギミックをリセットします。");
         }
     }
 
@@ -151,33 +205,45 @@ public class MonkeyGimmick : MonoBehaviour
             Destroy(debugMonkeyInstance);
             Debug.Log("MonkeyGimmick: 【デバッグ】猿を消去しました。");
         }
-        else if (jumpscareMonkeyPrefab != null && playerCamera != null)
+        else if (jumpscareMonkeyPrefab != null)
         {
-            // 表示されていない場合は出現させる（時間経過で消えない）
-            Vector3 spawnPosition = playerCamera.TransformPoint(spawnOffset);
-            Quaternion spawnRotation = Quaternion.LookRotation(-playerCamera.forward);
-            
-            debugMonkeyInstance = Instantiate(jumpscareMonkeyPrefab, spawnPosition, spawnRotation);
-            
-            if (followCamera)
+            // カメラが未設定ならメインカメラの取得を試みる
+            if (playerCamera == null || cam == null)
             {
-                debugMonkeyInstance.transform.SetParent(playerCamera);
+                TrySetupCamera();
             }
-            
-            Debug.Log("MonkeyGimmick: 【デバッグ】猿を出現させました！（もう一度Pキーで消去）");
+
+            if (playerCamera != null)
+            {
+                // 表示されていない場合は出現させる
+                Vector3 correctedOffset = GetCorrectedSpawnOffset();
+                Vector3 spawnPosition = playerCamera.TransformPoint(correctedOffset);
+                Quaternion spawnRotation = Quaternion.LookRotation(-playerCamera.forward);
+                
+                debugMonkeyInstance = Instantiate(jumpscareMonkeyPrefab, spawnPosition, spawnRotation);
+                
+                if (followCamera)
+                {
+                    debugMonkeyInstance.transform.SetParent(playerCamera);
+                }
+                
+                Debug.Log("MonkeyGimmick: 【デバッグ】猿を出現させました！（もう一度Pキーで消去）");
+            }
         }
     }
 
     private void TriggerJumpscare()
     {
-        isTriggered = true; // 1回だけ発動するようにフラグを立てる
+        // 1回だけ発動するようにフラグを立てる
+        isTriggered = true;
 
         if (jumpscareMonkeyPrefab != null && playerCamera != null)
         {
-            // カメラを基準にした相対位置（オフセット）を計算
-            Vector3 spawnPosition = playerCamera.TransformPoint(spawnOffset);
+            // カメラを基準にした相対位置を計算
+            Vector3 correctedOffset = GetCorrectedSpawnOffset();
+            Vector3 spawnPosition = playerCamera.TransformPoint(correctedOffset);
             
-            // プレイヤーの方を向かせる（カメラの向きの逆）
+            // プレイヤーの方を向かせる
             Quaternion spawnRotation = Quaternion.LookRotation(-playerCamera.forward);
 
             // 猿を召喚
@@ -199,8 +265,8 @@ public class MonkeyGimmick : MonoBehaviour
             // 指定時間後に消去
             Destroy(spawnedMonkey, disappearTime);
             
-            // アタッチされている元のオブジェクト（見つめていた猿）は即座に削除する
-            Destroy(gameObject);
+            // サーバーにオブジェクトの削除を要求する
+            CmdDestroyGimmick();
         }
         else
         {
@@ -209,15 +275,26 @@ public class MonkeyGimmick : MonoBehaviour
     }
 
     /// <summary>
+    /// サーバー上でこのオブジェクトを削除するコマンド
+    /// </summary>
+    [Command(requiresAuthority = false)]
+    private void CmdDestroyGimmick()
+    {
+        // サーバー側でオブジェクトを削除する
+        NetworkServer.Destroy(gameObject);
+    }
+
+    /// <summary>
     /// シーンビューでのみ表示されるギズモ
     /// </summary>
     private void OnDrawGizmos()
     {
-        // トリガーの範囲を可視化（緑色）
+        // トリガーの範囲を可視化
         Collider col = GetComponent<Collider>();
         if (col != null)
         {
-            Gizmos.color = new Color(0, 1, 0, 0.3f); // 半透明の緑
+            // 半透明の緑
+            Gizmos.color = new Color(0, 1, 0, 0.3f);
             
             if (col is BoxCollider box)
             {
@@ -245,11 +322,12 @@ public class MonkeyGimmick : MonoBehaviour
             Gizmos.matrix = Matrix4x4.identity;
         }
 
-        // 召喚される位置の目安を描画（カメラがインスペクターにセットされている場合のみ）
+        // 召喚される位置の目安を描画
         if (playerCamera != null)
         {
             Gizmos.color = Color.red;
-            Vector3 targetPos = playerCamera.TransformPoint(spawnOffset);
+            Vector3 correctedOffset = GetCorrectedSpawnOffset();
+            Vector3 targetPos = playerCamera.TransformPoint(correctedOffset);
             Gizmos.DrawWireSphere(targetPos, 0.2f);
             Gizmos.DrawLine(playerCamera.position, targetPos);
         }

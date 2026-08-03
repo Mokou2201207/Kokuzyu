@@ -3099,6 +3099,7 @@ GameObject:
   - component: {fileID: 8431584418253632394}
   - component: {fileID: 7218723927978887959}
   - component: {fileID: 7683643234174256649}
+  - component: {fileID: 1430134819991643305}
   m_Layer: 0
   m_Name: Monkey_Anim
   m_TagString: Untagged
@@ -3163,7 +3164,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 7
+  m_Radius: 10
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &7683643234174256649
 MonoBehaviour:
@@ -3177,12 +3178,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baf6dffb9a97fc54aa926c6c017f4aa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   playerCamera: {fileID: 0}
   jumpscareMonkeyPrefab: {fileID: 8834660594786796546, guid: 2e336911eae86f04798d32efa6fb51d7, type: 3}
-  requiredRotationAngle: 45
-  spawnOffset: {x: 0, y: -1.16, z: 0.85}
+  jumpscareSE: {fileID: 8300000, guid: 97ba15cbcde7096439efc17811523cea, type: 3}
+  spawnOffset: {x: 0, y: -1.5, z: 1.5}
   disappearTime: 0.5
   followCamera: 1
+--- !u!114 &1430134819991643305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8622009935996306525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 1848008462
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
 --- !u!1 &8779391958600572791
 GameObject:
   m_ObjectHideFlags: 0

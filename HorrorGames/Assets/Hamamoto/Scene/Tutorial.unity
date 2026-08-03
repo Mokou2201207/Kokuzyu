@@ -591,7 +591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1527,7 +1527,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2292,7 +2292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2722,6 +2722,12 @@ MonoBehaviour:
   - pageImage: {fileID: 21300000, guid: b3f1a61ecb200264991fed7ea5140991, type: 3}
     topText: "\u5341\u5B57\u67B6\u306B\u3064\u3044\u3066"
     pageText: "\u30A2\u30A4\u30C6\u30E0\u540D\u306F\u5341\u5B57\u67B6\n\u52B9\u679C\u306F\u4F7F\u7528\u6642\u306B\u546A\u3044\u30B2\u30FC\u30B8\u3092\u30EA\u30BB\u30C3\u30C8\u3057\u307E\u3059\u3002\n\u546A\u3044\u30B2\u30FC\u30B8\u306F\u5C11\u3057\u305A\u3064\u81EA\u52D5\u3067\u6E9C\u307E\u3063\u3066\u3044\u304D\u3001\u6E80\u30BF\u30F3\u306B\u306A\u3063\u3066\u3057\u307E\u3046\u3068\n\u30C7\u30E1\u30EA\u30C3\u30C8\u306A\u52B9\u679C\u3092\u591A\u304F\u53D6\u5F97\u3057\u3066\u3057\u307E\u3044\u307E\u3059\u3002\n"
+  - pageImage: {fileID: 21300000, guid: aa75ae796962ae44b991e9c1e857e296, type: 3}
+    topText: "\u8208\u596E\u5264\u306B\u3064\u3044\u3066"
+    pageText: "\u30A2\u30A4\u30C6\u30E0\u540D\u306F\u8208\u596E\u5264\n\u52B9\u679C\u306F\u4F7F\u7528\u6642\u306B\u4E00\u5B9A\u6642\u9593\u8DB3\u306E\u901F\u5EA6\u304C1.5\u500D\u65E9\u304F\u306A\u308A\u307E\u3059\u3002\n\u30B9\u30BF\u30DF\u30CA\u306E\u6E1B\u308A\u306F\u901A\u5E38\u3068\u540C\u3058\u3067\u3059\u3002"
+  - pageImage: {fileID: 21300000, guid: 06003b5c0384d944085be616a65a19c7, type: 3}
+    topText: "\u6804\u990A\u5264\u306B\u3064\u3044\u3066"
+    pageText: "\u30A2\u30A4\u30C6\u30E0\u540D\u306F\u6804\u990A\u5264\n\u52B9\u679C\u306F\u4F7F\u7528\u6642\u306B\u4E00\u5B9A\u6642\u9593\u30B9\u30BF\u30DF\u30CA\u304C\u6E1B\u308A\u307E\u305B\u3093\u3002"
   tutorialDisplayImage: {fileID: 954475414}
   tutorialTopText: {fileID: 710684487}
   tutorialDisplayText: {fileID: 426514961}
@@ -2873,7 +2879,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
